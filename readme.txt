@@ -3,29 +3,29 @@ Contributors: HDW Player
 Tags: hd, flash, flv, swf, video, plugin, player, webplayer, hdw player, hd weblayer, hdwplayer
 Requires at least:2.8.6
 Tested up to: 3.2.1
-Stable tag: 1.0
+Stable tag: 1.2
 License: GPLv2
 
 This plugin is provided by HDW Player. It enables you to embed HDW Player on your WordPress websites.
 
 == Description ==
 
-HDW Player is an impressive FLV player for WordPress websites. This plugin is different and unique from other plugins available in Wordpress. You can effortlessly install this plugin to your WordPress website. You would love the plugin for the look and the versatile options that comes with the player. Start downloading the plugin either from WordPress or from our website and savor the never-ending video experience.
+HDW player (video player & video gallery) is an impressive FLV player for WordPress websites. This plugin is different and unique from other plugins available in Wordpress. You can effortlessly install this plugin to your WordPress website. You would love the plugin for the look and the versatile options that comes with the player. Start downloading the plugin either from WordPress or from our website and savor the never-ending video experience.
 
 Features include:
 
-* HDW Player can handle variety of Media formats that flash can handle such as flv, mp4, 3g2, 3gp, aac, f4b, f4p, f4v, m4a, m4v, mov(h.264), sdp, vp6.	
+* HDW player (video player & video gallery) can handle variety of Media formats that flash can handle such as flv, mp4, 3g2, 3gp, aac, f4b, f4p, f4v, m4a, m4v, mov(h.264), sdp, vp6.	
 * The Player includes native support for playing back Youtube videos. It can be done by just providing Youtube page URL to the Player.
 * The Player includes native support for playing back Dailymotion videos. It can be done by just providing Dailymotion page URL to the Player.
 * RTMP stands for "Real Time Messaging Protocol". It is a proprietary protocol developed by Adobe Systems for streaming audio, video and data over the Internet, between a Flash player and a server. All the major RTMP servers such as Red5, Wowza and Adobe Flash Media Server are supported by HDW ebplayer.
 * Pseudo Streaming is a protocol that can be installed on regular HTTP servers such as Apache, Tomcat, IIS or lighthttpd. It uses a server-side script for Flash-to-Server communication that is supported by HDW ebplayer.
-* A Content Delivery Network (CDN) offers several advantages over a plain webserver for streaming video. For example, a CDN will be able to speedily deliver your videos across the country and globe, it will be able to stream your videos instead of a download and it will be able to scale to large numbers of videos and viewers. The Amazon CloudFront CDN is particularly interesting, since everybody can instantly and easily sign up for it. On top of that, Amazon only charges for usage (in terms of GB of video stored and streamed), so there's no fixed costs. HDW Player supports playback for the streams from Amazon Storage.
-* The HDW Player supports Live HTTP DVR streaming as offered by the Bitgravity CDN.
-* If you are using a commercial version with the KEY provided by HDW Player Sales Team, you will have option to remove HDW Player FREE text and you will be having your own Domain Name in the Context Menu that comes from the Right Click on the Player.
-* With our HDW Player, you have freedom of enabling / disabling all the features that you can read in detail from our Documentation part.
-* Using HDW Player you can embed your videos on other websites easily by using the code generated on clicking Share - Embed Button.
-* HDW Player has built-in option to share the video to the famous Social Networking sites such as Facebook, Twitter, etc...
-* HDW Player allow you to share the video (that impressed you) to your friend by using the Email option inside the Player.
+* A Content Delivery Network (CDN) offers several advantages over a plain webserver for streaming video. For example, a CDN will be able to speedily deliver your videos across the country and globe, it will be able to stream your videos instead of a download and it will be able to scale to large numbers of videos and viewers. The Amazon CloudFront CDN is particularly interesting, since everybody can instantly and easily sign up for it. On top of that, Amazon only charges for usage (in terms of GB of video stored and streamed), so there's no fixed costs. HDW player (video player & video gallery) supports playback for the streams from Amazon Storage.
+* The HDW player (video player & video gallery) supports Live HTTP DVR streaming as offered by the Bitgravity CDN.
+* If you are using a commercial version with the KEY provided by HDW player (video player & video gallery) Sales Team, you will have option to remove HDW Player FREE text and you will be having your own Domain Name in the Context Menu that comes from the Right Click on the Player.
+* With our HDW player (video player & video gallery), you have freedom of enabling / disabling all the features that you can read in detail from our Documentation part.
+* Using HDW player (video player & video gallery) you can embed your videos on other websites easily by using the code generated on clicking Share - Embed Button.
+* HDW player (video player & video gallery) has built-in option to share the video to the famous Social Networking sites such as Facebook, Twitter, etc...
+* HDW player (video player & video gallery) allow you to share the video (that impressed you) to your friend by using the Email option inside the Player.
 * Button Tooltip is available for each button on the Player.
 
 == Installation ==
