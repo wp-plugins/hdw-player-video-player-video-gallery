@@ -1,6 +1,6 @@
 					License:GPL2
 
-Copyright@2011 HDW Player  (email : admin@hdwplayer.com)
+Copyright@2013 HDW Player  (email : admin@hdwplayer.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
