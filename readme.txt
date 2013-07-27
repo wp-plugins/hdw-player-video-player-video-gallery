@@ -1,4 +1,4 @@
-=== HDW Player Plugin for WordPress ===
+=== HDW Player Plugin (Video Player and Video Gallery) ===
 Contributors: HDW Player
 Tags: hd, flash, flv, swf, video, plugin, player, webplayer, hdw player, hd weblayer, hdwplayer
 Requires at least:2.8.6
