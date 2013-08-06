@@ -11,9 +11,8 @@ function hdwplayer_plugin_shortcode( $atts ) {
 	$player = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer WHERE id=".$atts['id']);
 	
  	$siteurl = get_option('siteurl');
-	$src     = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/player.swf';
-	
-	$flashvars = 'baseW='.$siteurl.'&hdwid='.$player->id;
+	$src     = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/player.swf';	
+	$flashvars = 'baseW='.$siteurl.'&id='.encrypt_decrypt('encrypt', $player->id);
 
 	$embed  = '';
 	$html5  = '';

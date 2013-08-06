@@ -5,12 +5,11 @@
 ******************************************************************/
 
 
-//require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
 function hdwplayer_db_install() {
 	global $wpdb;
 	global $installed_hdwplayer_version;
-	global $hdwplayer_version;	
+	global $hdwplayer_version;
+	
 
 	if ($installed_hdwplayer_version != $hdwplayer_version) {
     	$table_name = $wpdb->prefix . "hdwplayer";
@@ -37,6 +36,7 @@ function hdwplayer_db_install() {
   		`fullscreen` tinyint(4) NOT NULL,
   		`playdock` tinyint(4) NOT NULL,
 		`playlist` tinyint(4) NOT NULL,
+		`token` varchar(20) NOT NULL,
 		UNIQUE KEY (`id`)
 		);";
    		$wpdb->query($sql);
@@ -102,7 +102,8 @@ function hdwplayer_db_install_data() {
   		'volume'           => 1,
   		'fullscreen'       => 1,
   		'playdock'         => 1,
-		'playlist'         => 1
+		'playlist'         => 1,
+		'token' 		   => null
 		));
 		
 		

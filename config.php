@@ -14,31 +14,42 @@ $path  = '';
 
 add_filter('query_vars','plugin_add_trigger');
 function plugin_add_trigger($vars) {
-	$vars[] = 'hdwid';
-    $vars[] = 'hdw_vid';
-    $vars[] = 'hdw_pid';
-    $vars[] = 'hdws';
+	$vars[] = 'wid';
+	$vars[] = 'view';
+    $vars[] = 'vid';
+    $vars[] = 'pid';
+    $vars[] = 'sid';
+    $vars[] = 'lic';
     return $vars;
 }
  
 add_action('template_redirect', 'plugin_trigger_check');
 	function plugin_trigger_check() {
-		if(get_query_var('hdwid')){
-			configXml(get_query_var('hdwid'));
-		}else if(get_query_var('hdw_vid')){
-			videoPlaylist(get_query_var('hdw_vid'));
-		}else if(get_query_var('hdw_pid')){
-			playlist(get_query_var('hdw_pid'));
-		}else if(get_query_var('hdws')){
-			skinXml(get_query_var('hdws'));
+		if(get_query_var('wid') && get_query_var('view') == "config"){
+			configXml(get_query_var('wid'));
+		}else if(get_query_var('vid') && checkL(get_query_var('lic'))){
+			videoPlaylist(get_query_var('vid'));
+		}else if(get_query_var('pid') && checkL(get_query_var('lic'))){
+			playlist(get_query_var('pid'));
+		}else if(get_query_var('sid') && checkL(get_query_var('lic'))){
+			skinXml(get_query_var('sid'));
 		}		  
 	}
-	
+		
 	function configXML($id){
-		global $wpdb;	
-		$config  = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer WHERE id=".$id);
+		global $wpdb;
+		$id = encrypt_decrypt('decrypt', $id);
+		$table_name = $wpdb->prefix."hdwplayer";
+		$config  = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id=".trim($id));
 		$siteurl = get_option('siteurl');
 		$br      = "\n";
+		if(!$config->id){
+			die('<b><h1>Restricted access</h1></b>');
+		}
+		srand ((double) microtime( )*1000000);
+		$dyn      = rand( );
+		$value['token'] = $dyn;
+		$wpdb->update($table_name, $value, array('id' => $config->id));
 		
 		header("content-type:text/xml;charset=utf-8");
 		echo '<?xml version="1.0" encoding="utf-8"?>'.$br;
@@ -49,18 +60,18 @@ add_action('template_redirect', 'plugin_trigger_check');
 		echo '<buffer>'.$config->buffertime.'</buffer>'.$br;
 		echo '<volumeLevel>'.$config->volumelevel.'</volumeLevel>'.$br;		
 		if($config->videoid){
-			echo '<playlistXml>'.$siteurl.'/?hdw_vid='.$config->videoid.'</playlistXml>'.$br;
+			echo '<playlistXml>'.$siteurl.'/?vid='.$config->videoid.'</playlistXml>'.$br;
 		} else {
-			echo '<playlistXml>'.$siteurl.'/?hdw_pid='.$config->playlistid.'</playlistXml>'.$br;
+			echo '<playlistXml>'.$siteurl.'/?pid='.$config->playlistid.'</playlistXml>'.$br;
 		}
-		echo '<skinXml>'.$siteurl.'/?hdws='.$config->id.'</skinXml>';		
+		echo '<skinXml>'.$siteurl.'/?sid='.$config->id.'</skinXml>';		
 		echo '<playlistAutoStart>'.castAsBoolean($config->playlistautoplay).'</playlistAutoStart>'.$br;
 		echo '<playlistOpen>'.castAsBoolean($config->playlistopen).'</playlistOpen>'.$br;
 		echo '<playlistRandom>'.castAsBoolean($config->playlistrandom).'</playlistRandom>'.$br;
 		echo '<emailPhp>'.$siteurl.'/wp-content/plugins/' . basename(dirname(__FILE__)) . '/email.php</emailPhp>'.$br;
+		echo '<token>'.$dyn.'</token>'.$br;
 		echo '</config>'.$br;
-		exit();
-		
+		exit();		
 	}
 	
 	function videoPlaylist($id){
@@ -179,6 +190,34 @@ add_action('template_redirect', 'plugin_trigger_check');
 		} else {
 			return 'false';
 		}
+	}
+	
+	function encrypt_decrypt($action, $string) {
+	   $output = false;  
+	
+	   if( $action == 'encrypt' ) {
+	       $output = (double)$string*525325.24;
+	       $output = base64_encode($output);
+	   }
+	   else if( $action == 'decrypt' ){
+	       $output = base64_decode(substr($string,0,-3));
+	       $output = (double)$output/525325.24;
+	   }
+	   return $output;
+	}
+	
+	function  checkL($lic){
+		global $wpdb;
+		$token = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."hdwplayer");
+		$license = array();
+		foreach($token as $tok){
+			$license[] = trim($tok->token);	
+		}		
+		if(in_array(trim($lic),$license)){
+			return true;
+		}
+		return false;
+		
 	}
 	
 

@@ -16,6 +16,7 @@ require_once('tabs.php');
 
 global $hdwplayer_version;
 global $installed_hdwplayer_version;
+global $mytoken;
 
 $hdwplayer_version = "1.1";
 $installed_hdwplayer_version = get_site_option('hdwplayer_version');
