@@ -16,6 +16,9 @@ function hdwplayer_db_uninstall() {
 	$table_name = $wpdb->prefix . "hdwplayer_playlist";
 	$wpdb->query("DROP TABLE IF EXISTS $table_name");
 	
+	$table_name = $wpdb->prefix . "hdwplayer_gallery";
+	$wpdb->query("DROP TABLE IF EXISTS $table_name");
+	
 	delete_option( "hdwplayer_version", $hdwplayer_version );
 }
     

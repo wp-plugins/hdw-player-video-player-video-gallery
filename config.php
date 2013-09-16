@@ -49,6 +49,10 @@ add_action('template_redirect', 'plugin_trigger_check');
 		srand ((double) microtime( )*1000000);
 		$dyn      = rand( );
 		$value['token'] = $dyn;
+		$video_id = '';
+		if($_GET['vid']){
+			$video_id  = '&amp;id='.$_GET['vid'];
+		}
 		$wpdb->update($table_name, $value, array('id' => $config->id));
 		
 		header("content-type:text/xml;charset=utf-8");
@@ -62,7 +66,7 @@ add_action('template_redirect', 'plugin_trigger_check');
 		if($config->videoid){
 			echo '<playlistXml>'.$siteurl.'/?vid='.$config->videoid.'</playlistXml>'.$br;
 		} else {
-			echo '<playlistXml>'.$siteurl.'/?pid='.$config->playlistid.'</playlistXml>'.$br;
+			echo '<playlistXml>'.$siteurl.'/?pid='.$config->playlistid.$video_id.'</playlistXml>'.$br;
 		}
 		echo '<skinXml>'.$siteurl.'/?sid='.$config->id.'</skinXml>';		
 		echo '<playlistAutoStart>'.castAsBoolean($config->playlistautoplay).'</playlistAutoStart>'.$br;
@@ -111,34 +115,46 @@ add_action('template_redirect', 'plugin_trigger_check');
 		global $wpdb;		
 		$siteurl = get_option('siteurl');
 		$br      = "\n";
+		$vid = ($_GET['id']       != '') ? $_GET['id'] : '';
+		$query = "SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE";
+		$query   .= ($vid       != '') ? ' id="'.intval($vid).'"' : '';
 		
-		$config  = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE playlistid=".intval($id));
-		$count   = count($config);
+		if($vid == ''){
+			$query .= " playlistid=".intval($id);
+		}
 		
+		$config = json_decode(json_encode($wpdb->get_results($query)),true);		
+		if($vid != ''){
+			$query = "SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE";
+			$query .= ' id!="'.intval($vid).'"';
+			$query .= ' AND playlistid="'.intval($id).'"';
+			$config = array_merge($config,json_decode(json_encode($wpdb->get_results($query)),true));			
+		}
+		if(!$config[0]['id']){
+			die('<b><h1>Restricted access</h1></b>');
+		}
 		header("content-type:text/xml;charset=utf-8");
 		echo '<?xml version="1.0" encoding="utf-8"?>'.$br;
 		echo '<playlist>'.$br;
-		
-		for ($i=0, $n=$count; $i < $n; $i++) {
-			$item = $config[$i];
+		foreach ($config as $item){
 			$br;
 			echo '<media>'.$br;
-			echo '<id>'.$item->id.'</id>'.$br;
-			echo '<type>'.$item->type.'</type>'.$br;
-			echo '<video>'.$item->video.'</video>'.$br;
-			if($item->hdvideo) {
-				echo '<hd>'.$item->hdvideo.'</hd>'.$br;
+			echo '<id>'.$item['id'].'</id>'.$br;
+			echo '<type>'.$item['type'].'</type>'.$br;
+			echo '<video>'.$item['video'].'</video>'.$br;
+			if($item['hdvideo']) {
+				echo '<hd>'.$item['hdvideo'].'</hd>'.$br;
 			}
-			echo '<streamer>'.$item->streamer.'</streamer>'.$br;
-			if($item->dvr) {
-				echo '<dvr>'.$item->dvr.'</dvr>'.$br;
+			echo '<streamer>'.$item['streamer'].'</streamer>'.$br;
+			if($item['dvr']) {
+				echo '<dvr>'.$item['dvr'].'</dvr>'.$br;
 			}
-			echo '<thumb>'.$item->thumb.'</thumb>'.$br;
-			if($item->token) {
-				echo '<token>'.$item->token.'</token>'.$br;
+			echo '<thumb>'.$item['thumb'].'</thumb>'.$br;
+			if($item['token']) {
+				echo '<token>'.$item['token'].'</token>'.$br;
 			}
-			echo '<preview>'.$item->preview.'</preview>'.$br;
-			echo '<title>'.$item->title.'</title>'.$br;
+			echo '<preview>'.$item['preview'].'</preview>'.$br;
+			echo '<title>'.$item['title'].'</title>'.$br;
 			echo '</media>'.$br.$br;
 		}		
 		echo '</playlist>'.$br;

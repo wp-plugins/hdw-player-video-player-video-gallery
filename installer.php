@@ -17,6 +17,7 @@ function hdwplayer_db_install() {
   		`id` int(5) NOT NULL AUTO_INCREMENT,
 		`videoid` int(5) NOT NULL,
 		`playlistid` int(5) NOT NULL,
+		`galleryid` int(5) NOT NULL,
   		`width` int(5) NOT NULL,
   		`height` int(5) NOT NULL,
 		`skinmode` varchar(20) NOT NULL,
@@ -62,6 +63,20 @@ function hdwplayer_db_install() {
 		$sql = "CREATE TABLE " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
   		`name` varchar(255) NOT NULL,
+		UNIQUE KEY (`id`)
+		);";
+   		$wpdb->query($sql);
+   		
+   		$table_name = $wpdb->prefix . "hdwplayer_gallery";
+   		$sql = "CREATE TABLE " . $table_name . " (
+  		`id` int(5) NOT NULL AUTO_INCREMENT,
+  		`name` varchar(255) NOT NULL,
+  		`rows` int(3) NOT NULL,
+  		`columns` int(3) NOT NULL,
+  		`limit` int(5) NOT NULL,
+  		`width` int(5) NOT NULL,
+  		`height` int(5) NOT NULL,
+  		`space` int(5) NOT NULL,
 		UNIQUE KEY (`id`)
 		);";
    		$wpdb->query($sql);

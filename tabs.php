@@ -4,7 +4,7 @@
 /* Created Tabular Menus
 ******************************************************************/
 function hdwplayer_admin_tabs($current = 'hdwplayer') {
-	$tabs  = array('hdwplayer' => 'HDW Player', 'videos' => 'Videos', 'playlist' => 'Playlist', 'documentation' => 'Documentation');
+	$tabs  = array('hdwplayer' => 'HDW Player', 'videos' => 'Videos', 'playlist' => 'Playlist', 'gallery' => 'Gallery', 'documentation' => 'Documentation');
 	$links = array();
 	
 	foreach( $tabs as $tab => $name ) {

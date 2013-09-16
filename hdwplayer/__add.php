@@ -97,9 +97,9 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=1");
     <?php  echo "<h3>" . __( 'Video Settings' ) . "</h3>"; ?>
     <table cellpadding="0" cellspacing="15">
       <tr>      	
-        <td><input type="radio" name="group" onchange="changeType('videoid');" <?php if($data->videoid){echo 'checked="checked" ';}?>>
+        <td><input type="radio" name="group" onchange="changeType('videoid');" checked="checked" >
         <label>&nbsp;&nbsp;<?php _e("Single Video" ); ?></label></td>
-        <td><input type="radio" name="group" onchange="changeType('playlistid');" <?php if($data->playlistid){echo 'checked="checked" ';}?>>
+        <td><input type="radio" name="group" onchange="changeType('playlistid');" >
         <label>&nbsp;&nbsp;<?php _e("Playlist" ); ?></label></td>
 	  </tr>
       <tr id="_videoid">
@@ -133,6 +133,27 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=1");
       	<td><?php _e("Playlist Random" ); ?></td>
         <td><input type="checkbox" id="playlistrandom" name="playlistrandom" value="1" <?php if($data->playlistrandom==1){echo 'checked="checked" ';}?>></td>
       </tr>
+      <tr id="_gallery">
+      	<td><?php _e("Display Gallery" ); ?></td>
+        <td><select id="_disgallery" onchange="javascript:changeGallery(this.options[this.selectedIndex].id)">
+        <option value="0" id="none"><?php _e("none" ); ?></option>
+        <option value="1" id="display"><?php _e("Display" ); ?></option>
+        </select></td>
+      </tr>
+      <tr id="_galleyid">
+      	<td><?php _e("Choose Your Gallery" ); ?></td>
+        <td><select id="galleryid" name="galleryid">
+        <option value="0" id="0" selected="selected" >None</option>
+            <?php
+            $k=count( $gallery);
+            for ($i=0; $i < $k; $i++)
+            {
+               $row = $gallery[$i];
+            ?>
+            <option value="<?php echo $row->id; ?>" id="<?php echo $row->id; ?>"><?php echo $row->name; ?></option>
+            <?php } ?>
+        </select></td>
+      </tr>
      </table> 
     <br />
     <input type="hidden" name="edited" value="true" />
@@ -144,6 +165,16 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=1");
 </div>
 <script type="text/javascript">
 changeType('videoid');
+changeGallery('none');
+function changeGallery(type){
+	document.getElementById('_galleyid').style.display="none";
+	switch(type){
+	case 'display':
+		document.getElementById('_galleyid').style.display="";
+		break;
+	default:;
+	}
+}
 
 function changeType(type) {
 	document.getElementById('_videoid').style.display="none";
@@ -151,12 +182,15 @@ function changeType(type) {
 	document.getElementById('_playlistautoplay').style.display="none";
 	document.getElementById('_playlistopen').style.display="none";
 	document.getElementById('_playlistrandom').style.display="none";
+	document.getElementById('_galleyid').style.display="none";
+	document.getElementById('_gallery').style.display="none";
 	switch(type) {
 		case 'playlistid':
 			document.getElementById('_playlistid').style.display="";
 			document.getElementById('_playlistautoplay').style.display="";
 			document.getElementById('_playlistopen').style.display="";
 			document.getElementById('_playlistrandom').style.display="";
+			document.getElementById('_gallery').style.display="";
 			break;
 		default:
 			document.getElementById('_videoid').style.display="";

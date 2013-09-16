@@ -133,6 +133,28 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
       	<td><?php _e("Playlist Random" ); ?></td>
         <td><input type="hidden" name="playlistrandom" value=""><input type="checkbox" id="playlistrandom" name="playlistrandom" value="1" <?php if($data->playlistrandom==1){echo 'checked="checked" ';}?>></td>
       </tr>
+      <tr id="_gallery">
+      	<td><?php _e("Display Gallery" ); ?></td>
+        <td><select id="_disgallery" onchange="javascript:changeGallery(this.options[this.selectedIndex].id)">
+        <option value="0" id="none"><?php _e("none" ); ?></option>
+        <option value="1" id="display"><?php _e("Display" ); ?></option>
+        </select></td>
+      </tr>
+      <tr id="_galleyid">
+      	<td><?php _e("Choose Your Gallery" ); ?></td>
+        <td><select id="galleryid" name="galleryid">
+        <option value="0" id="0">None</option>
+            <?php
+            $k=count( $gallery);
+            for ($i=0; $i < $k; $i++)
+            {
+               $row = $gallery[$i];
+            ?>
+            <option value="<?php echo $row->id; ?>" id="g<?php echo $row->id; ?>"><?php echo $row->name; ?></option><?php echo '<script>document.getElementById("g'.$data->galleryid.'").selected="selected"</script>'; ?>
+            <?php } ?>
+        </select>
+        </td>
+      </tr>
      </table>
     <br />
     <input type="hidden" name="edited" value="true" />
@@ -143,8 +165,21 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
   </form>
 </div>
 <?php if($data->videoid) { $type = "videoid"; } else { $type = "playlistid"; } ?>
+<?php if($data->galleryid) { $gtype = "display"; } else { $gtype = "none"; } ?>
 <script type="text/javascript">
 changeType(<?php echo "'".$type."'"; ?>);
+changeGallery(<?php echo "'".$gtype."'"; ?>);
+
+function changeGallery(type){
+	document.getElementById('_galleyid').style.display="none";
+	switch(type){
+	case 'display':
+		document.getElementById('_galleyid').style.display="";
+		document.getElementById("display").selected="selected"
+		break;
+	default:;
+	}
+}
 
 function changeType(type) {
 	document.getElementById('_videoid').style.display="none";
@@ -152,12 +187,15 @@ function changeType(type) {
 	document.getElementById('_playlistautoplay').style.display="none";
 	document.getElementById('_playlistopen').style.display="none";
 	document.getElementById('_playlistrandom').style.display="none";
+	document.getElementById('_galleyid').style.display="none";
+	document.getElementById('_gallery').style.display="none";
 	switch(type) {
 		case 'playlistid':
 			document.getElementById('_playlistid').style.display="";
 			document.getElementById('_playlistautoplay').style.display="";
 			document.getElementById('_playlistopen').style.display="";
 			document.getElementById('_playlistrandom').style.display="";
+			document.getElementById('_gallery').style.display="";
 			break;
 		default:
 			document.getElementById('_videoid').style.display="";

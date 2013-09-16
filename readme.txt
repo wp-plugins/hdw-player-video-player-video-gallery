@@ -3,7 +3,7 @@ Contributors: HDW Player
 Tags: video, player, gallery, video player, video gallery, hd, hdw, high, definition, wordpress, plugin, hd webplayer, hdw player
 Requires at least:2.8.6
 Tested up to: 3.5.1
-Stable tag: 1.0.4
+Stable tag: 2.0
 License: GPLv2
 
 This plugin is provided by HDW Player (video player & video gallery). It enables you to embed HDW Player on your WordPress websites.
@@ -94,6 +94,7 @@ Adding Webplayer to your Wordpress require three necessary steps :
 1. Creating a Playlist Name.
 2. Adding Videos to the Playlist.
 3. Adding the Playlist to the Player.
+4. Adding the Gallery to the Player.
 
 STEP 1 : Creating a Playlist Name
 
@@ -116,10 +117,29 @@ step 3. Adding the Playlist to the Player.
 4. Submit the form and check for the shortcode from Grid View.
 5. Just copy the shortcode to your Post and Experience the Playback.
 
+Step 4: Creating a Gallery
+
+1. Go to Site Admin > Settings > HDW Player > Gallery.
+2. Click on the Add New Gallery button.
+3. Fill Gallery Settings and save.
+
+
+Step 5: Adding Gallery to Player
+
+1. Go to Site Admin > Settings > HDW Player.
+2. Click on the Add New Player or Edit button.
+3. Select the Playlist Option under Video Settings.
+4. Change the Display Gallery Option From none  to Display
+5. Choose Your Gallery Name and Save it.
+
 Note : Creating a Playlist is not compulsary. You can also directly add the Video ID instead of Adding as Playlist by just choosing the Single Video Option.
 
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0 =
 * Initial release of the HDW Player Plugin for WordPress
+
+
+= 2.0 =
+* Adding Gallery Option to HDW Player Plugin.

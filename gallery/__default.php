@@ -1,11 +1,9 @@
 <?php
 
 global $wpdb;
-$table_name = $wpdb->prefix . "hdwplayer";
+$table_name = $wpdb->prefix . "hdwplayer_gallery";
 $data       = array();
 
-$playlist   = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."hdwplayer_playlist");
-$gallery   = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."hdwplayer_gallery");
 /******************************************************************
 /* Execute Actions
 ******************************************************************/

@@ -4,7 +4,17 @@
 /* Inserting (or) Updating the DB Table when edited
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
-	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
+	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);	
+	if($_POST['type'] == "youtube"){
+		$youtubeID = array();
+		preg_match('/http\:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})/',$_POST['video'],$youtubeID);
+		if($_POST['thumb'] == ""){
+			$_POST['thumb']     = 'http://img.youtube.com/vi/'.$youtubeID[1].'/default.jpg';
+		}
+		if($_POST['preview'] == ""){
+			$_POST['preview']   = 'http://img.youtube.com/vi/'.$youtubeID[1].'/0.jpg';
+		}
+	}
 	$wpdb->insert($table_name, $_POST);
 	echo '<script>window.location="?page=videos";</script>';
 }
