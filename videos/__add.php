@@ -15,6 +15,40 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			$_POST['preview']   = 'http://img.youtube.com/vi/'.$youtubeID[1].'/0.jpg';
 		}
 	}
+	if($_POST['type'] == "vimeo"){
+		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
+			$link = $_POST['video'];
+			$link = str_replace('http://vimeo.com/', 'http://vimeo.com/api/v2/video/', $link) . '.php';
+			$html_returned = unserialize(file_get_contents($link));
+			if($_POST['thumb'] == ''){
+				$_POST['thumb'] = $html_returned[0]['thumbnail_medium'];
+			}
+			if($_POST['preview'] == ''){
+				$_POST['preview'] = $html_returned[0]['thumbnail_large'];
+			}
+		}
+	}
+	if($_POST['type'] == "dailymotion"){
+		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
+			$url = $_POST['video'];
+			$id = strtok(basename($url), '_');
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, "https://api.dailymotion.com/video/$id?fields=thumbnail_medium_url,thumbnail_url");
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			$output = curl_exec($ch);
+			curl_close($ch);
+			$output = json_decode($output);
+			if($_POST['thumb'] == ''){
+				$_POST['thumb'] = $output->thumbnail_medium_url;
+			}
+			if($_POST['preview'] == ''){
+				$_POST['preview'] = $output->thumbnail_url;
+			}
+		}
+	}
 	$wpdb->insert($table_name, $_POST);
 	echo '<script>window.location="?page=videos";</script>';
 }
@@ -39,6 +73,7 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
             <option value="video" id="video" >Direct URL</option>
             <option value="youtube" id="youtube" >Youtube Videos</option>
             <option value="dailymotion" id="dailymotion" >Dailymotion Videos</option>
+            <option value="vimeo" id="vimeo" >Vimeo Videos</option>
             <option value="rtmp" id="rtmp" >RTMP Streams</option>
             <option value="highwinds" id="highwinds" >SMIL</option>
             <option value="lighttpd" id="lighttpd" >Lighttpd Videos</option>

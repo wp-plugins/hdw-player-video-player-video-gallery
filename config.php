@@ -236,5 +236,26 @@ add_action('template_redirect', 'plugin_trigger_check');
 		
 	}
 	
+function hdwplayer_gallery_ajax(){
+	if(!isset($_POST['action']))
+	{
+		return;
+	}
+	$action = $_POST['action'];
+	if('flashvars' == $action)
+	{
+		global $wpdb;
+		$player = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer WHERE id=" . $_POST ['id'] );
+		$siteurl = get_option ( 'siteurl' );
+		$flashvars = 'baseW=' . $siteurl . '&id=' . encrypt_decrypt ( 'encrypt', $player->id );
+		$response = array(
+			'flashvars'=>$flashvars,
+			'height'=>$player->height,
+			'width'=>$player->width
+		);
+		die(json_encode($response));
+	}
+}
+	
 
 ?>

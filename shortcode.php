@@ -126,27 +126,30 @@ function hdwplayer_plugin_shortcode($atts) {
 		});
 	</script>';
 		$embed .= '<script>
-		function changePlayer(video,div){		
-			var flashvars = "' . $flashvars . '"+"&vid="+video;
-		    var src = "' . $src . '";
-		    var width = "' . $player->width . '";
-		    var height = "' . $player->height . '";
-		    var code = "";
-		    	code +=  "<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" width=\"' . $player->width . '\" height=\"' . $player->height . '\">";
-		    	code += "<param name=\"movie\" value=\"' . $src . '\" />";
-				code += "<param name=\"allowfullscreen\" value=\"true\" />";
-				code += "<param name=\"allowscriptaccess\" value=\"always\" />";
-				code += "<param name=\"flashvars\" value=\""+flashvars+"\" />";
-				code += "<object type=\"application/x-shockwave-flash\" data=\"' . $src . '\" width=\"' . $player->width . '\" height=\"' . $player->height . '\">";
-				code += "<param name=\"movie\" value=\"' . $src . '\" />";
-				code += "<param name=\"allowfullscreen\" value=\"true\" />";
-				code += "<param name=\"allowscriptaccess\" value=\"always\" />";
-				code += "<param name=\"flashvars\" value=\""+flashvars+"\" />";
-				//code += "<p>"html5"</p>";
-				code += "</object>";
-				code += "</object>";
-				var divid = "player_div"+div;
-				document.getElementById(divid).innerHTML = code;
+		function changePlayer(video,div){
+			$.post(location.href,
+				{
+					action:"flashvars",
+					id:div
+				},function(response){
+					var flashvars = response.flashvars+"&vid="+video;
+					var code = "";
+			    	code += "<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" width=\""+response.width+"\" height=\""+response.height+"\">";
+			    	code += "<param name=\"movie\" value=\"' . $src . '\" />";
+					code += "<param name=\"allowfullscreen\" value=\"true\" />";
+					code += "<param name=\"allowscriptaccess\" value=\"always\" />";
+					code += "<param name=\"flashvars\" value=\""+flashvars+"\" />";
+					code += "<object type=\"application/x-shockwave-flash\" data=\"' . $src . '\" width=\""+response.width+"\" height=\""+response.height+"\">";
+					code += "<param name=\"movie\" value=\"' . $src . '\" />";
+					code += "<param name=\"allowfullscreen\" value=\"true\" />";
+					code += "<param name=\"allowscriptaccess\" value=\"always\" />";
+					code += "<param name=\"flashvars\" value=\""+flashvars+"\" />";
+					code += "</object>";
+					code += "</object>";
+					var divid = "player_div"+div;
+					document.getElementById(divid).innerHTML = code;
+				}, "json"
+			);				
 		}
 		</script>';
 		$embed .= '<div id="slider' . $player->id . '">';
