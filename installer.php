@@ -144,8 +144,28 @@ function hdwplayer_db_install_data() {
 ******************************************************************/
 function hdwplayer_update_db_check() {
 	 global $hdwplayer_version;
+	 global $wpdb;	 
      if (get_site_option('hdwplayer_version') != $hdwplayer_version) {
         update_option( "hdwplayer_version", $hdwplayer_version );
+        $table_name = $wpdb->prefix ."hdwplayer";
+        $sql = "show columns from ".$table_name." like 'galleryid'";
+        if( !$wpdb->query($sql)){
+        	$sql = "alter table ".$table_name." add column galleryid int(5)";
+        	$wpdb->query($sql);
+        }
+        $table_name = $wpdb->prefix . "hdwplayer_gallery";
+        $sql = "CREATE TABLE " . $table_name . " (
+  		`id` int(5) NOT NULL AUTO_INCREMENT,
+  		`name` varchar(255) NOT NULL,
+  		`rows` int(3) NOT NULL,
+  		`columns` int(3) NOT NULL,
+  		`limit` int(5) NOT NULL,
+  		`width` int(5) NOT NULL,
+  		`height` int(5) NOT NULL,
+  		`space` int(5) NOT NULL,
+		UNIQUE KEY (`id`)
+		);";
+        $wpdb->query($sql);
      }
 }
     
