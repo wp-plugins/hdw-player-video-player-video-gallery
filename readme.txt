@@ -3,7 +3,7 @@ Contributors: HDW Player
 Tags: video, player, gallery, video player, video gallery, hd, hdw, high, definition, wordpress, plugin, hd webplayer, hdw player
 Requires at least:2.8.6
 Tested up to: 3.6.1
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv2
 
 This plugin is provided by HDW Player (video player & video gallery). It enables you to embed HDW Player on your WordPress websites.
@@ -12,9 +12,9 @@ This plugin is provided by HDW Player (video player & video gallery). It enables
 
 HDW player (video player & video gallery) is an impressive FLV player for WordPress websites. This plugin is different and unique from other plugins available in Wordpress. You can effortlessly install this plugin to your WordPress website. You would love the plugin for the look and the versatile options that comes with the player. Start downloading the plugin either from WordPress or from our website and savor the never-ending video experience.
 
-[Main Domain](http://www.hdwplayer.com)
+[HDW Player](http://www.hdwplayer.com)
 
-[HDW Player Gallery Page](http://www.hdwplayer.com/wordpress/)
+[WordPress Video Gallery](http://www.hdwplayer.com/wordpress/)
 
 Features include:
 
