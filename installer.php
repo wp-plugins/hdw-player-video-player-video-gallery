@@ -153,6 +153,7 @@ function hdwplayer_update_db_check() {
         	$sql = "alter table ".$table_name." add column galleryid int(5)";
         	$wpdb->query($sql);
         }
+        
         $table_name = $wpdb->prefix . "hdwplayer_gallery";
         $sql = "CREATE TABLE " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
@@ -166,6 +167,13 @@ function hdwplayer_update_db_check() {
 		UNIQUE KEY (`id`)
 		);";
         $wpdb->query($sql);
+        
+        $table_name = $wpdb->prefix ."hdwplayer_videos";
+        $sql = "show columns from ".$table_name." like 'ordering'";
+        if( !$wpdb->query($sql)){
+        	$sql = "ALTER TABLE ".$table_name." ADD COLUMN ordering int(11) DEFAULT '0'";
+        	$wpdb->query($sql);
+        }
      }
 }
     

@@ -13,7 +13,7 @@ $headers  = "From: "."<" . $_POST["from"] .">\r\n";
 $headers .= "Reply-To: " . $_POST["from"] . "\r\n";
 $headers .= "Return-path: " . $_POST["from"];
 
-$message  = $_POST["note"] . "\n\n";
+$message  = $_POST["message"] . "\n\n";
 $message .= "Video URL: " . $url;
 
 if(mail($to, $subject, $message, $headers)) {

@@ -49,6 +49,9 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			}
 		}
 	}
+	if($_POST['playlistid'] != '0'){
+		$_POST['ordering'] = '1';
+	}
 	$wpdb->insert($table_name, $_POST);
 	echo '<script>window.location="?page=videos";</script>';
 }

@@ -19,6 +19,10 @@ switch($_GET['opt']) {
 	case 'delete':
 		require_once('__delete.php');
 		break;
+	case 'up':
+	case 'down':
+		require_once('__order.php');
+		break;
 	default:
 		require_once('__grid.php');		
 }

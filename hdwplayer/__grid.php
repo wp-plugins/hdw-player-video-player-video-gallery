@@ -82,7 +82,7 @@ class Hdwplayer_Table extends WP_List_Table {
 		
         $this->process_bulk_action();
 
- 		$per_page = 5;
+ 		$per_page = 10;
         $current_page = $this->get_pagenum();
         $total_items = count($data);
         $data = array_slice($data,(($current_page-1)*$per_page),$per_page);

@@ -7,10 +7,12 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 	var $table_name;
 	var $wpdb;
 	var $category;
+	var $data;
+	var $i = 0;
     
     function __construct(){
         global $status, $page;                
-        parent::__construct( array( 'singular' => 'video', 'plural' => 'videos', 'ajax' => false ) );        
+        parent::__construct( array( 'singular' => 'video', 'plural' => 'videos', 'ordering' => 'order', 'ajax' => false ) );        
     }
     
     function column_default($item, $column_name){
@@ -34,6 +36,24 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
     function column_cb($item){
         return sprintf( '<input type="checkbox" name="%1$s[]" value="%2$s" />', $this->_args['singular'], $item->id );
     }
+    function column_ordering($item){
+    	if($item->ordering == 0){
+    		$this->i += 1;
+    		return sprintf( '<div style="margin-top:4px;">0</div>');
+    	}else{
+    		$output ='<input type="text" size="2" name="%1$s['.$item->playlistid.']['.$item->id.']" value="%2$s" /><div style="text-align:center; margin-top:-23px;">';
+    		if($item->playlistid == @$this->data[$this->i-1]->playlistid){
+    			$output .= '<a class="button-secondary" href="?page=videos&opt=up&id='.$item->id.'&oid='.@$this->data[$this->i-1]->id.'" title="Move Up">&#9650;</a>';
+    		}
+    		if($item->playlistid == @$this->data[$this->i+1]->playlistid){
+    			$output .= '<a class="button-secondary" href="?page=videos&opt=down&id='.$item->id.'&oid='.@$this->data[$this->i+1]->id.'" title="Move Down">&#9660;</a>';
+    		}
+    		$output .= '</div>';
+    		$this->i += 1;
+    		return sprintf( $output, $this->_args['ordering'], $item->ordering );
+    	}
+    
+    }
 	
 	function get_columns(){
         $columns = array(
@@ -42,6 +62,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 			'playlistid'  => 'Playlist Name',
             'title'       => 'Video Title',
 			'video'       => 'Video URL',
+        	'ordering'    => 'Order',
 			'actions'     => 'Actions'
         );
         return $columns;
@@ -49,6 +70,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 
     function get_bulk_actions() {
         $actions = array( 'delete' => 'Delete' );
+        $actions = array( 'order' => 'Change Order' );
         return $actions;
     }
 
@@ -59,12 +81,42 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
         	}
 			echo '<script>window.location="?page=videos";</script>';
 		}
+		if( 'order'===$this->current_action()){
+			foreach ($_GET['order'] as $key=>$val)
+			{
+				foreach ($val as $k=>$v){
+					$order['ordering'] = $v;
+					if($v < 1){
+						$order['ordering'] = 1;
+					}
+					$this->wpdb->update($this->table_name, $order, array('id' => $k));
+				}
+				$ordering = array();
+				$data  = $this->wpdb->get_results("SELECT id,ordering FROM $this->table_name WHERE playlistid=$key ORDER BY ordering");
+				foreach($data as $d){
+					
+					if(trim($d->ordering) < 1){
+						$d->ordering = 1;
+					}
+					if(in_array(trim($d->ordering),$ordering)){
+						$order['ordering'] = trim($d->ordering) + 1;
+						echo $order['ordering'];						
+						$this->wpdb->update($this->table_name, $order, array('id' => $d->id));
+						$ordering[] = trim($d->ordering) + 1;
+					}else{
+						$ordering[] = trim($d->ordering);
+					}
+				}
+			}
+			echo '<script>window.location="?page=videos";</script>';
+		}
     }
 
     function prepare_items( $data, $table_name, $wpdb, $category ) {
 		$this->table_name = $table_name;
 		$this->wpdb = $wpdb;
 		$this->category = $category;
+		$this->data = $data;
 
         $columns = $this->get_columns();
         $hidden = array();
@@ -73,8 +125,9 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 		
         $this->process_bulk_action();
 
- 		$per_page = 5;
+ 		$per_page = 10;
         $current_page = $this->get_pagenum();
+        $this->i = ($current_page-1)*$per_page;
         $total_items = count($data);
         $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
         $this->items = $data;
@@ -88,7 +141,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 <?php
 	_e( "HDW Player is the Fastest Growing Online Video Platform for your Websites. For More visit <a href='http://hdwplayer.com'>HDW Player</a>." );
 	$table = new Hdwplayer_Videos_Table();
-	$data  = $wpdb->get_results("SELECT id,playlistid,title,video FROM $table_name");
+	$data  = $wpdb->get_results("SELECT id,playlistid,title,video,ordering FROM $table_name ORDER BY playlistid,ordering");
 	$category = array();
 	for ($i=0, $n=count($playlist); $i < $n; $i++) {
 		$category[$playlist[$i]->id] = $playlist[$i]->name;		

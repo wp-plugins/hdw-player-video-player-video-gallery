@@ -49,6 +49,12 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			}
 		}
 	}
+	$video  = $wpdb->get_row("SELECT playlistid FROM ".$table_name." WHERE id=".trim($_GET['id']));
+	if($_POST['playlistid'] == '0'){
+		$_POST['ordering'] = '0';
+	}else if($video->playlistid != $_POST['playlistid']){
+		$_POST['ordering'] = '1';
+	}
 	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
 	echo '<script>window.location="?page=videos";</script>';
 }

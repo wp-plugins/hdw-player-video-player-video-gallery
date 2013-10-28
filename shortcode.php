@@ -22,9 +22,9 @@ function hdwplayer_plugin_shortcode($atts) {
 	
 	$flashvars = 'baseW=' . $siteurl . '&id=' . encrypt_decrypt ( 'encrypt', $player->id );
 	
-	$gallery = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_gallery WHERE id=" . $player->galleryid );
+	$gallery = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_gallery WHERE id=" . $player->galleryid);
 	if ($gallery->id) {
-		$playlist = $wpdb->get_results ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . intval ( $player->playlistid ) );
+		$playlist = $wpdb->get_results ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . intval ( $player->playlistid ) ." ORDER BY ordering" );
 	}
 	
 	$embed = '';
@@ -33,7 +33,7 @@ function hdwplayer_plugin_shortcode($atts) {
 	if ($player->videoid) {
 		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE id=" . $player->videoid );
 	} else if ($player->playlistid) {
-		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . $player->playlistid . " LIMIT 1" );
+		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . $player->playlistid . " ORDER BY ordering LIMIT 1" );
 	}
 	
 	switch ($results->type) {
@@ -81,6 +81,9 @@ function hdwplayer_plugin_shortcode($atts) {
 		$totalvideo = count ( $playlist );
 		if ($totalvideo < $gallery->limit) {
 			$gallery->limit = $totalvideo;
+		}
+		if($totalvideo > $gallery->limit){
+			$totalvideo = $gallery->limit;
 		}
 		$pagelimit = $gallery->rows * $gallery->columns;
 		$totaldiv = intval ( $totalvideo / $pagelimit );

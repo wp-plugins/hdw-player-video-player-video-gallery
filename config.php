@@ -122,12 +122,14 @@ add_action('template_redirect', 'plugin_trigger_check');
 		if($vid == ''){
 			$query .= " playlistid=".intval($id);
 		}
+		$query .= ' ORDER BY ordering';
 		
 		$config = json_decode(json_encode($wpdb->get_results($query)),true);		
 		if($vid != ''){
 			$query = "SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE";
 			$query .= ' id!="'.intval($vid).'"';
 			$query .= ' AND playlistid="'.intval($id).'"';
+			$query .= ' ORDER BY ordering';
 			$config = array_merge($config,json_decode(json_encode($wpdb->get_results($query)),true));			
 		}
 		if(!$config[0]['id']){
