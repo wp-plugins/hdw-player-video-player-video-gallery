@@ -173,7 +173,14 @@ function hdwplayer_update_db_check() {
         if( !$wpdb->query($sql)){
         	$sql = "ALTER TABLE ".$table_name." ADD COLUMN ordering int(11) DEFAULT '0'";
         	$wpdb->query($sql);
+        	$result = $wpdb->get_results("SELECT * FROM $table_name");
+        	foreach($result as $res){
+        		if($res->playlistid != 0){
+        			$wpdb->update($table_name, array('ordering' => '1' ), array('id' => $res->id));
+        		}        		
+        	}
         }
+        
      }
 }
     

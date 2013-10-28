@@ -3,7 +3,7 @@
 Plugin Name:HDW Player
 Plugin URI:http://hdwplayer.com/
 Description: HDW Player Plugin for Wordpress Websites.
-Version:2.4
+Version:2.4.1
 Author:Mr. Hdwplayer
 Author URI:http://hdwplayer.com
 License: GPLv2
@@ -18,7 +18,7 @@ global $hdwplayer_version;
 global $installed_hdwplayer_version;
 global $mytoken;
 
-$hdwplayer_version = "2.4";
+$hdwplayer_version = "2.4.1";
 $installed_hdwplayer_version = get_site_option('hdwplayer_version');
 
 /******************************************************************
