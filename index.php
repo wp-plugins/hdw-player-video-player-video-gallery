@@ -18,7 +18,7 @@ global $hdwplayer_version;
 global $installed_hdwplayer_version;
 global $mytoken;
 
-$hdwplayer_version = "2.4.2";
+$hdwplayer_version = "2.4.3";
 $installed_hdwplayer_version = get_site_option('hdwplayer_version');
 
 /******************************************************************

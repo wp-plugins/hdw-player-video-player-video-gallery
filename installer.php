@@ -55,6 +55,7 @@ function hdwplayer_db_install() {
   		`preview` varchar(255) NOT NULL,
 		`thumb` varchar(255) NOT NULL,
   		`token` varchar(255) NOT NULL,
+		`ordering` int(11) NOT NULL DEFAULT '0',
 		UNIQUE KEY (`id`)
 		);";
    		$wpdb->query($sql);
@@ -145,6 +146,18 @@ function hdwplayer_db_install_data() {
 function hdwplayer_update_db_check() {
 	 global $hdwplayer_version;
 	 global $wpdb;	 
+	 $table_name = $wpdb->prefix ."hdwplayer_videos";
+	 $sql = "show columns from ".$table_name." like 'ordering'";
+	 if( !$wpdb->query($sql)){
+	 	$sql = "ALTER TABLE ".$table_name." ADD COLUMN ordering int(11) DEFAULT '0'";
+	 	$wpdb->query($sql);
+	 	$result = $wpdb->get_results("SELECT * FROM $table_name");
+	 	foreach($result as $res){
+	 		if($res->playlistid != 0){
+	 			$wpdb->update($table_name, array('ordering' => '1' ), array('id' => $res->id));
+	 		}
+	 	}
+	 }
      if (get_site_option('hdwplayer_version') != $hdwplayer_version) {
         update_option( "hdwplayer_version", $hdwplayer_version );
         $table_name = $wpdb->prefix ."hdwplayer";
@@ -167,20 +180,6 @@ function hdwplayer_update_db_check() {
 		UNIQUE KEY (`id`)
 		);";
         $wpdb->query($sql);
-        
-        $table_name = $wpdb->prefix ."hdwplayer_videos";
-        $sql = "show columns from ".$table_name." like 'ordering'";
-        if( !$wpdb->query($sql)){
-        	$sql = "ALTER TABLE ".$table_name." ADD COLUMN ordering int(11) DEFAULT '0'";
-        	$wpdb->query($sql);
-        	$result = $wpdb->get_results("SELECT * FROM $table_name");
-        	foreach($result as $res){
-        		if($res->playlistid != 0){
-        			$wpdb->update($table_name, array('ordering' => '1' ), array('id' => $res->id));
-        		}        		
-        	}
-        }
-        
      }
 }
     
