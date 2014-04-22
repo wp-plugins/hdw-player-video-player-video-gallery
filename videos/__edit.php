@@ -5,55 +5,16 @@
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
-	if($_POST['type'] == "youtube"){
-		$youtubeID = array();
-		preg_match('/http\:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})/',$_POST['video'],$youtubeID);
-		if($_POST['thumb'] == ""){
-			$_POST['thumb']     = 'http://img.youtube.com/vi/'.$youtubeID[1].'/default.jpg';
-		}
-		if($_POST['preview'] == ""){
-			$_POST['preview']   = 'http://img.youtube.com/vi/'.$youtubeID[1].'/0.jpg';
-		}
-	}
-	if($_POST['type'] == "vimeo"){
-		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
-			$link = $_POST['video'];
-			$link = str_replace('http://vimeo.com/', 'http://vimeo.com/api/v2/video/', $link) . '.php';
-			$html_returned = unserialize(file_get_contents($link));
-			if($_POST['thumb'] == ''){
-				$_POST['thumb'] = $html_returned[0]['thumbnail_medium'];
-			}
-			if($_POST['preview'] == ''){
-				$_POST['preview'] = $html_returned[0]['thumbnail_large'];
-			}
-		}
-	}
-	if($_POST['type'] == "dailymotion"){
-		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
-			$url = $_POST['video'];
-			$id = strtok(basename($url), '_');
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, "https://api.dailymotion.com/video/$id?fields=thumbnail_medium_url,thumbnail_url");
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-			$output = curl_exec($ch);
-			curl_close($ch);
-			$output = json_decode($output);
-			if($_POST['thumb'] == ''){
-				$_POST['thumb'] = $output->thumbnail_medium_url;
-			}
-			if($_POST['preview'] == ''){
-				$_POST['preview'] = $output->thumbnail_url;
-			}
-		}
-	}
 	$video  = $wpdb->get_row("SELECT playlistid FROM ".$table_name." WHERE id=".trim($_GET['id']));
-	if($_POST['playlistid'] == '0'){
-		$_POST['ordering'] = '0';
-	}else if($video->playlistid != $_POST['playlistid']){
-		$_POST['ordering'] = '1';
+	
+	if($video->playlistid != $_POST['playlistid']){
+		$lorder  = $wpdb->get_row("SELECT MAX(ordering) As max FROM ".$table_name." WHERE playlistid=".$_POST['playlistid']);
+		if($lorder->max != '')
+		{
+			$_POST['ordering'] = $lorder->max+1;
+		}else{
+			$_POST['ordering'] = '1';
+		}
 	}
 	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
 	echo '<script>window.location="?page=videos";</script>';
@@ -89,10 +50,10 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
             <option value="highwinds" id="highwinds" >SMIL</option>
             <option value="lighttpd" id="lighttpd" >Lighttpd Videos</option>
             <option value="bitgravity" id="bitgravity" >Bitgravity Videos</option>
-          </select>
+          </select><span id="features" style="margin-left: 15px; color: rgb(218, 41, 233); font-weight:bold;"></span>
           <?php echo '<script>document.getElementById("'.$data->type.'").selected="selected"</script>'; ?> </td>
       </tr>
-      <tr>
+      <tr id="__video">
         <td width="30%"><?php _e("Video URL " ); ?></td>
         <td><input type="text" id="_video" name="video" value="<?php echo $data->video; ?>" size="50"></td>
       </tr>
@@ -100,25 +61,13 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
         <td width="30%"><?php _e("HD Video URL" ); ?></td>
         <td><input type="text" id="hdvideo" name="hdvideo" value="<?php echo $data->hdvideo; ?>" size="50"></td>
       </tr>
-      <tr id="_streamer">
-        <td class="key"><?php _e("Streamer" ); ?></td>
-        <td><input type="text" id="streamer" name="streamer" size="60" value="<?php echo $data->streamer; ?>" /></td>
-      </tr>
-      <tr id="_token">
-        <td class="key"><?php _e("Security Token [Wowza]" ); ?></td>
-        <td><input type="text" id="token" name="token" size="60" value="<?php echo $data->token; ?>"/></td>
-      </tr>
-      <tr>
+      <tr id="_preview">
         <td><?php _e("Preview Image" ); ?></td>
         <td><input type="text" id="preview" name="preview" value="<?php echo $data->preview; ?>" size="50"></td>
       </tr>
-       <tr>
+       <tr id="_thumb">
         <td><?php _e("Thumb Image" ); ?></td>
         <td><input type="text" id="thumb" name="thumb" value="<?php echo $data->thumb; ?>" size="50"></td>
-      </tr>
-      <tr id="_dvr">
-        <td class="key"><?php _e("DVR" ); ?></td>
-        <td><input type="hidden" name="dvr" value=""><input type="checkbox" id="dvr" name="dvr" value="1" <?php if($data->dvr==1){echo 'checked="checked" ';}?> /></td>
       </tr>
       <tr>
         <td class="key"><?php _e("Choose your Playlist" ); ?></td>
@@ -149,24 +98,34 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
  changeType(<?php echo "'".$data->type."'"; ?>);
 
  function changeType(typ) {
-
+	document.getElementById('features').style.display="none";
+	document.getElementById('__video').style.display="none";
 	document.getElementById('_hdvideo').style.display="none";
-	document.getElementById('_streamer').style.display="none";
-	document.getElementById('_dvr').style.display="none";
-	document.getElementById('_token').style.display="none";
-
-    switch(typ) {
-		case 'rtmp' :
-			document.getElementById('_streamer').style.display="";
-			document.getElementById('_token').style.display="";
+	document.getElementById('_thumb').style.display="none";
+	document.getElementById('_preview').style.display="none";
+	switch(typ) {
+		case 'youtube' :
+		case 'dailymotion' :
+			document.getElementById('features').style.display="";
+			document.getElementById('features').innerHTML="Pro Features";
 			break;
+		case 'vimeo' :
+		case 'rtmp' :
+		case 'highwinds' :
+		case 'lighttpd' :
 		case 'bitgravity' :
-			document.getElementById('_dvr').style.display="";
+			document.getElementById('features').style.display="";
+			document.getElementById('features').innerHTML="Premium Features";
 			break;
 		case 'video' :
+			document.getElementById('__video').style.display="";
 			document.getElementById('_hdvideo').style.display="";
+			document.getElementById('_thumb').style.display="";
+			document.getElementById('_preview').style.display="";
 			break;
-		}
+		default:
+			
+	}
  }
 
 function webplayer_validate() {

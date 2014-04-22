@@ -37,21 +37,16 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
         return sprintf( '<input type="checkbox" name="%1$s[]" value="%2$s" />', $this->_args['singular'], $item->id );
     }
     function column_ordering($item){
-    	if($item->ordering == 0){
-    		$this->i += 1;
-    		return sprintf( '<div style="margin-top:4px;">0</div>');
-    	}else{
-    		$output ='<input type="text" size="2" name="%1$s['.$item->playlistid.']['.$item->id.']" value="%2$s" /><div style="text-align:center; margin-top:-23px;">';
-    		if($item->playlistid == @$this->data[$this->i-1]->playlistid){
-    			$output .= '<a class="button-secondary" href="?page=videos&opt=up&id='.$item->id.'&oid='.@$this->data[$this->i-1]->id.'" title="Move Up">&#9650;</a>';
-    		}
-    		if($item->playlistid == @$this->data[$this->i+1]->playlistid){
-    			$output .= '<a class="button-secondary" href="?page=videos&opt=down&id='.$item->id.'&oid='.@$this->data[$this->i+1]->id.'" title="Move Down">&#9660;</a>';
-    		}
-    		$output .= '</div>';
-    		$this->i += 1;
-    		return sprintf( $output, $this->_args['ordering'], $item->ordering );
+    	$output ='<input type="text" size="2" name="%1$s['.$item->playlistid.']['.$item->id.']" value="%2$s" /><div style="text-align:center; margin-top:-23px;">';
+    	if($item->playlistid == @$this->data[$this->i-1]->playlistid){
+    		$output .= '<a class="button-secondary" href="?page=videos&opt=up&id='.$item->id.'&oid='.@$this->data[$this->i-1]->id.'" title="Move Up">&#9650;</a>';
     	}
+    	if($item->playlistid == @$this->data[$this->i+1]->playlistid){
+    		$output .= '<a class="button-secondary" href="?page=videos&opt=down&id='.$item->id.'&oid='.@$this->data[$this->i+1]->id.'" title="Move Down">&#9660;</a>';
+    	}
+    	$output .= '</div>';
+    	$this->i += 1;
+    	return sprintf( $output, $this->_args['ordering'], $item->ordering );
     
     }
 	
@@ -99,8 +94,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 						$d->ordering = 1;
 					}
 					if(in_array(trim($d->ordering),$ordering)){
-						$order['ordering'] = trim($d->ordering) + 1;
-						echo $order['ordering'];						
+						$order['ordering'] = trim($d->ordering) + 1;	
 						$this->wpdb->update($this->table_name, $order, array('id' => $d->id));
 						$ordering[] = trim($d->ordering) + 1;
 					}else{

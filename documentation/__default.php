@@ -62,7 +62,7 @@ echo "<br />";
 _e( "5. Choose Your Gallery Name and Save it." );
 echo "<br />";
 echo "<br />";
- _e( "<strong>Note : </strong>Creating Playlist and Gallery are not compulsary. You can also directly add the <i>Video ID</i> instead of <i>Adding as Playlist</i> by just choosing the Single Video Option.");
+ _e( "<strong>Note : </strong>Creating Playlist and Gallery are not compulsary. You can also directly add the <i>Video Name</i> instead of <i>Adding as Playlist</i> by just choosing the Single Video Option.");
  
 
   

@@ -135,7 +135,7 @@ function hdwplayer_db_install_data() {
 		'preview'          => '',
 		'thumb'            => '',
 		'token'            => '',
-		'playlistid'       => 0
+		'playlistid'       => 1
 		));
 	}
 }

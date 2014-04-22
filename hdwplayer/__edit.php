@@ -4,7 +4,10 @@
 /* Inserting (or) Updating the DB Table when edited
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
-	unset($_POST['group'], $_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
+	unset($_POST['group'], $_POST['edited'], $_POST['video'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
+	if(!$_POST['playlistid']){
+		$_POST['galleryid'] = 0;
+	}
 	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
 	echo '<script>window.location="?page=hdwplayer";</script>';
 }
@@ -13,8 +16,15 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 /* Getting Input from the DB Table
 ******************************************************************/
 $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
+$vname = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE id=".$data->videoid);
 	
 ?>
+<style>
+.autocomplete-suggestions { border: 1px solid #999; width: 429px !important; background: #fff; cursor: default; overflow: auto; }
+.autocomplete-suggestion { padding: 5px 5px; font-size: 13px; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #f0f0f0; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399ff; }
+</style>
 <div class="wrap">
   <br />
   <?php _e( "HDW Player is the Fastest Growing Online Video Platform for your Websites. For More visit <a href='http://hdwplayer.com'>HDW Player</a>." ); ?>
@@ -41,7 +51,6 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
             <option value="static" id="static">Static</option>
           </select>
           <?php echo '<script>document.getElementById("'.$data->skinmode.'").selected="selected"</script>'; ?> </td>
-        </td>
       </tr>
       <tr>
         <td><?php _e("Stretch Type" ); ?></td>
@@ -52,7 +61,6 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
             <option value="exactfit" id="exactfit">Exact Fit</option>
           </select>
           <?php echo '<script>document.getElementById("'.$data->stretchtype.'").selected="selected"</script>'; ?> </td>
-        </td>
       </tr>
       <tr>
         <td><?php _e("Buffer Time" ); ?></td>
@@ -104,7 +112,7 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
 	  </tr>
       <tr id="_videoid">
       	<td><?php _e("Video ID" ); ?></td>
-        <td><input type="text" id="videoid" name="videoid" value="<?php echo $data->videoid; ?>" size="50"></td>
+        <td><input type="hidden" id="videoid" name="videoid" value="<?php echo $data->videoid; ?>"><input type="text" id="video" name="video" value="<?php echo $vname->title; ?>" size="50"></td>
       </tr>
       <tr id="_playlistid">
         <td class="key"><?php _e("Choose your Playlist" ); ?></td>
@@ -133,17 +141,10 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
       	<td><?php _e("Playlist Random" ); ?></td>
         <td><input type="hidden" name="playlistrandom" value=""><input type="checkbox" id="playlistrandom" name="playlistrandom" value="1" <?php if($data->playlistrandom==1){echo 'checked="checked" ';}?>></td>
       </tr>
-      <tr id="_gallery">
-      	<td><?php _e("Display Gallery" ); ?></td>
-        <td><select id="_disgallery" onchange="javascript:changeGallery(this.options[this.selectedIndex].id)">
-        <option value="0" id="none"><?php _e("none" ); ?></option>
-        <option value="1" id="display"><?php _e("Display" ); ?></option>
-        </select></td>
-      </tr>
-      <tr id="_galleyid">
+      <tr id="_galleryid">
       	<td><?php _e("Choose Your Gallery" ); ?></td>
         <td><select id="galleryid" name="galleryid">
-        <option value="0" id="0">None</option>
+        <option value="0" id="g0">None</option>
             <?php
             $k=count( $gallery);
             for ($i=0; $i < $k; $i++)
@@ -165,21 +166,10 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
   </form>
 </div>
 <?php if($data->videoid) { $type = "videoid"; } else { $type = "playlistid"; } ?>
-<?php if($data->galleryid) { $gtype = "display"; } else { $gtype = "none"; } ?>
+<script type="text/javascript" src="<?php echo $js; ?>"></script>
+<script type="text/javascript" src="<?php echo $jsac; ?>"></script>
 <script type="text/javascript">
 changeType(<?php echo "'".$type."'"; ?>);
-changeGallery(<?php echo "'".$gtype."'"; ?>);
-
-function changeGallery(type){
-	document.getElementById('_galleyid').style.display="none";
-	switch(type){
-	case 'display':
-		document.getElementById('_galleyid').style.display="";
-		document.getElementById("display").selected="selected"
-		break;
-	default:;
-	}
-}
 
 function changeType(type) {
 	document.getElementById('_videoid').style.display="none";
@@ -187,15 +177,14 @@ function changeType(type) {
 	document.getElementById('_playlistautoplay').style.display="none";
 	document.getElementById('_playlistopen').style.display="none";
 	document.getElementById('_playlistrandom').style.display="none";
-	document.getElementById('_galleyid').style.display="none";
-	document.getElementById('_gallery').style.display="none";
+	document.getElementById('_galleryid').style.display="none";
 	switch(type) {
 		case 'playlistid':
 			document.getElementById('_playlistid').style.display="";
 			document.getElementById('_playlistautoplay').style.display="";
 			document.getElementById('_playlistopen').style.display="";
 			document.getElementById('_playlistrandom').style.display="";
-			document.getElementById('_gallery').style.display="";
+			document.getElementById('_galleryid').style.display="";
 			break;
 		default:
 			document.getElementById('_videoid').style.display="";
@@ -221,4 +210,21 @@ function hdwplayer_validate() {
 	
 	return true;
 }
+</script>
+<script>
+$(function(){
+	  var video = [
+		<?php foreach ($video as $data) { ?>
+          	{ value: '<?php echo $data->title; ?>', data: '<?php echo $data->id; ?>' },
+        <?php } ?>
+	  ];	  
+	  
+	  $('#video').autocomplete({
+	    lookup: video,
+	    onSelect: function (suggestion) {
+	      document.getElementById("videoid").value = suggestion.data;
+	    }
+	  });  
+
+	});
 </script>
