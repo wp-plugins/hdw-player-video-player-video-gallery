@@ -67,7 +67,10 @@ class Mobile_Detect {
     public function isMobile() {
         return $this->isMobile;
     }
-
+    
+    public function userAgent() {
+    	return $this->userAgent;
+    }
 
     protected function isDevice($device) {
         $var    = "is" . ucfirst($device);

@@ -45,7 +45,7 @@ class Hdwplayer_Gallery_Table extends WP_List_Table {
     function process_bulk_action() {
 		if( 'delete'===$this->current_action() ) {			
 			foreach($_GET['gallery'] as $gallery) {
-				$this->wpdb->query("DELETE FROM $this->table_name WHERE id=".$gallery);
+				$this->wpdb->query($this->wpdb->prepare("DELETE FROM $this->table_name WHERE id=%d",$gallery));
         	}
 			echo '<script>window.location="?page=gallery";</script>';
 		}

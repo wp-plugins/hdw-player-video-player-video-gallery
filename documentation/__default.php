@@ -62,6 +62,13 @@ echo "<br />";
 _e( "5. Choose Your Gallery Name and Save it." );
 echo "<br />";
 echo "<br />";
+
+echo "<h3>" . __( "Step 6: Add Player to WordPress Page/Post" ) . "</h3>";
+_e( "1. Copy code from <i>HDW Player</i> menu." );
+echo "<br />";
+_e( "2. Paste code to WordPress page/post." );
+echo "<br />";
+echo "<br />";
  _e( "<strong>Note : </strong>Creating Playlist and Gallery are not compulsary. You can also directly add the <i>Video Name</i> instead of <i>Adding as Playlist</i> by just choosing the Single Video Option.");
  
 

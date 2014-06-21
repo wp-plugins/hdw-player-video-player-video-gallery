@@ -17,7 +17,7 @@ function plugin_add_trigger($vars) {
 }
  
 add_action('template_redirect', 'plugin_trigger_check');
-	function plugin_trigger_check() {
+	function plugin_trigger_check() {		
 		if(get_query_var('wid') && get_query_var('view') == "config"){
 			configXml(get_query_var('wid'));
 		}else if(get_query_var('vid') && checkL(get_query_var('lic'))){
@@ -31,7 +31,7 @@ add_action('template_redirect', 'plugin_trigger_check');
 		global $wpdb;
 		$id = encrypt_decrypt('decrypt', $id);
 		$table_name = $wpdb->prefix."hdwplayer";
-		$config  = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id=".trim($id));
+		$config  = $wpdb->get_row( $wpdb->prepare("SELECT * FROM ".$table_name." WHERE id = %d",trim($id)));
 		$siteurl = get_option('siteurl');
 		$br      = "\n";
 		if(!$config->id){
@@ -73,8 +73,7 @@ add_action('template_redirect', 'plugin_trigger_check');
 		global $wpdb;		
 		$siteurl = get_option('siteurl');
 		$br      = "\n";
-		
-		$config  = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE id=".intval($id));
+		$config  = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE id = %d",intval($id)));
 		$item = $config[0];
 		
 		header("content-type:text/xml;charset=utf-8");
@@ -103,26 +102,34 @@ add_action('template_redirect', 'plugin_trigger_check');
 	}
 	
 	function playlist($id){
-		global $wpdb;		
+		global $wpdb;
+		$val = 0;
 		$siteurl = get_option('siteurl');
 		$br      = "\n";
 		$vid = ($_GET['id']       != '') ? $_GET['id'] : '';
+		
 		$query = "SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE";
-		$query   .= ($vid       != '') ? ' id="'.intval($vid).'"' : '';
 		
 		if($vid == ''){
-			$query .= " playlistid=".intval($id);
+			$query .= " playlistid = %d";
+			$val = intval($id);
+		}else{
+			$query .= " id = %d";
+			$val = intval($vid);
 		}
+		
 		$query .= ' ORDER BY ordering';
 		
-		$config = json_decode(json_encode($wpdb->get_results($query)),true);		
+		$config = json_decode(json_encode($wpdb->get_results($wpdb->prepare($query,$val))),true);
+		
 		if($vid != ''){
 			$query = "SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE";
-			$query .= ' id!="'.intval($vid).'"';
-			$query .= ' AND playlistid="'.intval($id).'"';
-			$query .= ' ORDER BY ordering';
-			$config = array_merge($config,json_decode(json_encode($wpdb->get_results($query)),true));			
+			$query .= " id != %d";
+			$query .= " AND playlistid = %d";
+			$query .= " ORDER BY ordering";
+			$config = array_merge($config,json_decode(json_encode($wpdb->get_results($wpdb->prepare($query,intval($vid),intval($id)))),true));			
 		}
+		
 		if(!$config[0]['id']){
 			die('<b><h1>Restricted access</h1></b>');
 		}
@@ -133,7 +140,7 @@ add_action('template_redirect', 'plugin_trigger_check');
 			$br;
 			echo '<media>'.$br;
 			echo '<id>'.$item['id'].'</id>'.$br;
-			echo '<type>video</type>'.$br;
+			echo '<type>'.$item['type'].'</type>'.$br;
 			echo '<video>'.$item['video'].'</video>'.$br;
 			if($item['hdvideo']) {
 				echo '<hd>'.$item['hdvideo'].'</hd>'.$br;
@@ -212,28 +219,28 @@ function hdwplayer_gallery_ajax(){
 	if('flashvars' == $action)
 	{
 		global $wpdb;
-		$player = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer WHERE id=" . intval($_POST ['id']) );
+		$player = $wpdb->get_row ( $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer WHERE id = %d",intval($_POST ['id'])));
 		$siteurl = get_option ( 'siteurl' );		
-		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE id=" . intval($_POST ['vid']) );
+		$results = $wpdb->get_row ( $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE id = %d",intval($_POST ['vid'])));
 		$detect = new Mobile_Detect();
 		if ($detect->isMobile()) {
 			switch ($results->type) {
 				case 'youtube' :
 					$url_string = parse_url ( $results->video, PHP_URL_QUERY );
 					parse_str ( $url_string, $args );
-					$html5 = '<iframe title="YouTube video player" width="' . $player->width . '" height="' . $player->height . '" src="http://www.youtube.com/embed/' . $args ['v'] . '" frameborder="0" allowfullscreen></iframe>';
+					$html5 = '<iframe title="YouTube video player" width="100%" height="100%" src="http://www.youtube.com/embed/' . $args ['v'] . '" frameborder="0" allowfullscreen></iframe>';
 					break;
 				case 'dailymotion' :
-					$html5 = '<iframe frameborder="0" width="' . $player->width . '" height="' . $player->height . '" src="' . $results->video . '"></iframe>';
+					$html5 = '<iframe frameborder="0" width="100%" height="100%" src="' . $results->video . '"></iframe>';
 					break;
 				case 'rtmp' :
 					$url_string = str_replace ( 'rtmp', 'http', $results->streamer ) . '/' . $results->video . '/playlist.m3u8';
-					$html5 = '<video poster="' . $results->preview . '"  onclick="this.play();" width="' . $player->width . '" height="' . $player->height . '" controls>';
+					$html5 = '<video poster="' . $results->preview . '"  onclick="this.play();" width="100%" height="100%" controls>';
 					$html5 .= '<source src="' . $url_string . '" />';
 					$html5 .= '</video>';
 					break;
 				default :
-					$html5 = '<video poster="' . $results->preview . '"  onclick="this.play();" width="' . $player->width . '" height="' . $player->height . '" controls>';
+					$html5 = '<video poster="' . $results->preview . '"  onclick="this.play();" width="100%" height="100%" controls>';
 					$html5 .= '<source src="' . $results->video . '" />';
 					$html5 .= '</video>';
 			}
@@ -259,6 +266,7 @@ function hdwplayer_gallery_ajax(){
 		);
 		die(json_encode($response));
 	}
+	
 	if('email' == $action && checkL($_POST["lic"]))
 	{
 		$to       = $_POST["to"];

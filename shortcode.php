@@ -12,7 +12,7 @@ function hdwplayer_plugin_shortcode($atts) {
 	$embed = '';
 	$html5 = '';
 	
-	$player = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer WHERE id=" . intval($atts ['id'] ));
+	$player = $wpdb->get_row ($wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer WHERE id=%d",intval($atts ['id'])));
 	
 	$siteurl = get_option ( 'siteurl' );
 	$src = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/player.swf';
@@ -20,59 +20,81 @@ function hdwplayer_plugin_shortcode($atts) {
 	$buttons = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/assets/buttons.png';
 	$jquery = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/js/jquery.min.js';
 	$slider = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/js/jquery.slider.min.js';
-	$inner = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/assets/inner.png';
-	$outer = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/assets/outer.png';
+	$inner = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/assets/inner1.png';
+	$outer = $siteurl . '/wp-content/plugins/' . basename ( dirname ( __FILE__ ) ) . '/assets/outer1.png';
 	$playerurl = $siteurl . '/?embed=view';
 	
 	$flashvars = 'baseW=' . $siteurl . '&id=' . encrypt_decrypt ( 'encrypt', $player->id );
 	
-	$gallery = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_gallery WHERE id=" . $player->galleryid);
-	
-	if ($player->playlistid) {
-		$playlist = $wpdb->get_results ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . intval ( $player->playlistid ) ." ORDER BY ordering" );
-	}
+	$gallery = $wpdb->get_row ($wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer_gallery WHERE id=%d",$player->galleryid));
 	
 	if ($player->videoid) {
-		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE id=" . $player->videoid );
+		
+		$results = $wpdb->get_row ($wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE id=%d",$player->videoid));
+		
 	} else if ($player->playlistid) {
-		$results = $wpdb->get_row ( "SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=" . $player->playlistid . " ORDER BY ordering LIMIT 1" );
+		
+		$results = $wpdb->get_row ($wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid=%d ORDER BY ordering LIMIT 1",intval ( $player->playlistid )) );
+		$playlist = $wpdb->get_results ($wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "hdwplayer_videos WHERE playlistid = %d ORDER BY ordering",intval ( $player->playlistid )));
+		
 	}
-	
-	$embed .= '<script type="text/javascript" src="'.$jquery.'"></script>';
 	
 	$detect = new Mobile_Detect();
 	if ($detect->isMobile()) {
-	
+		$html5 .= '<style>
+			@media only screen and (max-width: 640px) {
+			#player_div' . $player->id . ', #player_container'.$player->id.'{
+			width:100% !important;
+			height: 360px !important;
+			}
+			}
+			
+			@media only screen and (max-width: 460px) {
+			#player_div' . $player->id . ', #player_container'.$player->id.'{
+			width:100% !important;
+			height: 300px !important;
+			}
+			}
+		
+			@media only screen and (max-width: 320px) {
+			#player_div' . $player->id . ', #player_container'.$player->id.'{
+			width:100% !important;
+			height: 200px !important;
+			}
+			}
+			</style>';
 		if(count($playlist) > 1 && $player->playlist == 1){
 			$isHtml5 = true;
-			$html5 .= '<div id="player_container'.$player->id.'" style="width:' . $player->width . 'px; height:' . $player->height . 'px; margin-bottom: 15px; position:relative; overflow:hidden;" >';
-			$html5 .= '<div style="position:absolute;" id="player_div' . $player->id . '">';
+			$html5 .= '<div id="player_container'.$player->id.'" style=" background:#000; width:' . $player->width . 'px; height:' . $player->height . 'px; margin-bottom: 15px; position:relative; overflow:hidden;" >';			
 		}
-	
+		$html5 .= '<div style="';
+		if($isHtml5){
+			$html5 .= 'position:absolute;';
+		}
+		$html5 .= ' width:' . $player->width . 'px; height:' . $player->height . 'px; background:#000;" id="player_div' . $player->id . '">';
 		switch ($results->type) {
 			case 'youtube' :
 				$url_string = parse_url ( $results->video, PHP_URL_QUERY );
 				parse_str ( $url_string, $args );
-				$html5 .= '<iframe title="YouTube video player" width="' . $player->width . '" height="' . $player->height . '" src="http://www.youtube.com/embed/' . $args ['v'] . '" frameborder="0" allowfullscreen></iframe>';
+				$html5 .= '<iframe title="YouTube video player" width="100%" height="100%" src="http://www.youtube.com/embed/' . $args ['v'] . '" frameborder="0" allowfullscreen></iframe>';
 				break;
 			case 'dailymotion' :
-				$html5 .= '<iframe frameborder="0" width="' . $player->width . '" height="' . $player->height . '" src="' . $results->video . '"></iframe>';
+				$html5 .= '<iframe frameborder="0" width="100%" height="100%" src="' . $results->video . '"></iframe>';
 				break;
 			case 'rtmp' :
 				$url_string = str_replace ( 'rtmp', 'http', $results->streamer ) . '/' . $results->video . '/playlist.m3u8';
-				$html5 .= '<video poster="' . $results->preview . '" onclick="this.play();" width="' . $player->width . '" height="' . $player->height . '" controls>';
+				$html5 .= '<video poster="' . $results->preview . '" onclick="this.play();" width="100%" height="100%" controls>';
 				$html5 .= '<source src="' . $url_string . '" />';
 				$html5 .= '</video>';
 				break;
 			default :
-				$html5 .= '<video poster="' . $results->preview . '" onclick="this.play();" width="' . $player->width . '" height="' . $player->height . '" controls>';
+				$html5 .= '<video poster="' . $results->preview . '" onclick="this.play();" width="100%" height="100%" controls>';
 				$html5 .= '<source src="' . $results->video . '" />';
 				$html5 .= '</video>';
 		}
-	
-		if(count($playlist) > 1 && $player->playlist == 1){
-			$html5 .= '</div>';
-			$html5 .= '<img id="' . $player->id . 'hdwplaylist" class="outer" style="display:none; margin:' . ($player->height/2 - 32) . 'px 0px 0px ' . ($player->width - 35) . 'px; position:absolute; cursor:pointer;" title="More Videos" src="'.$inner.'" />';
+		$html5 .= '</div>';
+		if(count($playlist) > 1 && $player->playlist == 1){			
+			$html5 .= '<img id="' . $player->id . 'hdwplaylist" class="outer" style="display:none; margin:' . ($player->height/2 - 20) . 'px 0px 0px ' . ($player->width - 22) . 'px; position:absolute; cursor:pointer;" title="More Videos" src="'.$inner.'" />';
 			$html5 .= '<div id="' . $player->id . 'hdwvideos" class="outer" style="display:block;; width:150px; height:' . $player->height . 'px; margin:0px 0px 0px ' . ($player->width) . 'px; background:black; position:absolute;">';
 			$html5 .= '<div style="font-variant:small-caps; color:white; margin:0px 0px 2px 28px; height:20px;">';
 			$html5 .= 'Related Videos</div>';
@@ -85,7 +107,7 @@ function hdwplayer_plugin_shortcode($atts) {
 			}
 					$html5 .= '<div id="' . $player->id . 'video' . $playlist[$i]->id . '" style="margin:2px 0px 0px 0px; ';
 							if($i%2) { $html5 .=  'background: #1b1c1c;'; }
-							$html5 .= ' font-variant:small-caps; font-size:11px; color:white; text-align:center; cursor:pointer;"><a onclick="changePlayer(\'' . $playlist[$i]->id . '\',\'' . $player->id . '\');" >' . ($playlist[$i]->title) . '</a></div>';
+							$html5 .= ' font-variant:small-caps; font-size:11px; color:white; text-align:center; cursor:pointer;"><a style="color:#fff; text-decoration:none;" onclick="changePlayer(\'' . $playlist[$i]->id . '\',\'' . $player->id . '\');" >' . ($playlist[$i]->title) . '</a></div>';
 			}
 			$html5 .= '</div></div>';
 			$html5 .= '</div>';
@@ -100,7 +122,7 @@ function hdwplayer_plugin_shortcode($atts) {
 					$html5 .= 'var list = parseInt( $j("#' . $player->id . 'hdwplaylist").css("marginLeft") );';
 					$html5 .= 'list = list - 150;';
 					$html5 .= '$j("#' . $player->id . 'hdwplaylist").animate({"margin-left":list+"px"},500);';
-					$html5 .= '$j("#player_div' . $player->id . '").animate({"margin-left":"-150px"},500);';
+					$html5 .= '$j("#player_div' . $player->id . '").animate({"margin-left":"-160px"},500);';
 					$html5 .= 'var v = parseInt( $j("#' . $player->id . 'hdwvideos").css("marginLeft") );';
 					$html5 .= 'v = v - 150;';
 					$html5 .= '$j("#' . $player->id . 'hdwvideos").css({"display":"block"});';
@@ -123,7 +145,29 @@ function hdwplayer_plugin_shortcode($atts) {
 					$html5 .= '</script>';
 					$html5 .= '<script type="text/javascript">';
 					$html5 .= '$j(document).ready(function(){';
-					$html5 .= '$j("#' . $player->id . 'hdwplaylist").css({"display":"block","z-index":"99"});';
+					$html5 .= '$j("#' . $player->id . 'hdwplaylist").css({"display":"block","z-index":"99"});';					
+					$html5 .= 'var ht = parseInt( $j("#player_container' . $player->id . '").css("height") );';
+					$html5 .= 'var wd = parseInt( $j("#player_container' . $player->id . '").css("width") );';
+							
+					$html5 .= '$j("#' . $player->id . 'hdwplaylist").css({"margin-top":ht/2 - 20+"px","margin-left":wd - 22+"px"});';
+					$html5 .= '$j("#' . $player->id . 'hdwvideos").css({"height":ht+"px","margin-left":wd+"px"});';
+					$html5 .= '$j("#' . $player->id . 'playlistbody").css({"height":ht-22+"px"});';
+					$html5 .= '});';
+					$html5 .= '</script>';
+
+					$html5 .= '<script type="text/javascript">';
+					$html5 .= '$j(document).ready(function(){';
+					$html5 .= '$j(window).resize(function(){';
+					$html5 .= 'var ht = parseInt( $j("#player_container' . $player->id . '").css("height") );';
+					$html5 .= 'var wd = parseInt( $j("#player_container' . $player->id . '").css("width") );';
+					$html5 .= 'if($j("#' . $player->id . 'hdwplaylist").attr("class") == "outer"){';						
+					$html5 .= '$j("#' . $player->id . 'hdwplaylist").css({"margin-top":ht/2 - 20+"px","margin-left":wd - 22+"px"});';
+					$html5 .= '$j("#' . $player->id . 'hdwvideos").css({"height":ht+"px","margin-left":wd+"px"});';
+					$html5 .= '}else{';
+					$html5 .= '$j("#' . $player->id . 'hdwplaylist").css({"margin-top":ht/2 - 20+"px","margin-left":wd - 22-150+"px"}); ';
+					$html5 .= '$j("#' . $player->id . 'hdwvideos").css({"height":ht+"px","margin-left":wd-150+"px"});}';
+					$html5 .= '$j("#' . $player->id . 'playlistbody").css({"height":ht-22+"px"});';
+					$html5 .= '});';
 					$html5 .= '});';
 					$html5 .= '</script>';
 					if($player->playlistopen == '1'){
@@ -168,7 +212,10 @@ function hdwplayer_plugin_shortcode($atts) {
 		$k = 0;
 		$n = 0;
 		$exit = 0;
-		
+		if ($detect->isMobile() && (strpos($detect->userAgent(),'iPhone') !== FALSE || strpos($detect->userAgent(),'Android') !== FALSE))
+		{
+			$gallery->rows = $gallery->columns = 1;
+		}
 		$totalvideo = count ( $playlist );
 		
 		if ($totalvideo < $gallery->limit) {

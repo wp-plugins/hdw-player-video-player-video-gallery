@@ -8,15 +8,16 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 	if(!$_POST['playlistid']){
 		$_POST['galleryid'] = 0;
 	}
-	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
+	$format = array('%d','%d','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d');
+	$wpdb->update($table_name, $_POST, array('id' => intval($_GET['id'])),$format);
 	echo '<script>window.location="?page=hdwplayer";</script>';
 }
 
 /******************************************************************
 /* Getting Input from the DB Table
 ******************************************************************/
-$data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
-$vname = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE id=".$data->videoid);
+$data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",intval($_GET['id'])));
+$vname = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE id=%d",$data->videoid));
 	
 ?>
 <style>
@@ -72,33 +73,33 @@ $vname = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE i
       </tr>
       <tr>
         <td><?php _e("AutoPlay" ); ?></td>
-        <td><input type="hidden" name="autoplay" value=""><input type="checkbox" id="autoplay" name="autoplay" value="1" <?php if($data->autoplay==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="autoplay" value="0"><input type="checkbox" id="autoplay" name="autoplay" value="1" <?php if($data->autoplay==1){echo 'checked="checked" ';}?>></td>
       </tr>
     </table>
     <?php  echo "<h3>" . __( 'Skin Settings' ) . "</h3>"; ?>
     <table cellpadding="0" cellspacing="15">
       <tr>
-        <td><input type="hidden" name="controlbar" value=""><input type="checkbox" id="controlbar" name="controlbar" value="1" <?php if($data->controlbar==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="controlbar" value="0"><input type="checkbox" id="controlbar" name="controlbar" value="1" <?php if($data->controlbar==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Control Bar" ); ?></td>
-        <td><input type="hidden" name="playpause" value=""><input type="checkbox" id="playpause" name="playpause" value="1" <?php if($data->playpause==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playpause" value="0"><input type="checkbox" id="playpause" name="playpause" value="1" <?php if($data->playpause==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("PlayPause Dock" ); ?></td>
-        <td><input type="hidden" name="progressbar" value=""><input type="checkbox" id="progressbar" name="progressbar" value="1" <?php if($data->progressbar==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="progressbar" value="0"><input type="checkbox" id="progressbar" name="progressbar" value="1" <?php if($data->progressbar==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Progress Bar" ); ?></td>
-        <td><input type="hidden" name="timer" value=""><input type="checkbox" id="timer" name="timer" value="1" <?php if($data->timer==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="timer" value="0"><input type="checkbox" id="timer" name="timer" value="1" <?php if($data->timer==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Timer Dock" ); ?></td>
       </tr>
       <tr>
-        <td><input type="hidden" name="share" value=""><input type="checkbox" id="share" name="share" value="1" <?php if($data->share==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="share" value="0"><input type="checkbox" id="share" name="share" value="1" <?php if($data->share==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Share Dock" ); ?></td>
-        <td><input type="hidden" name="volume" value=""><input type="checkbox" id="volume" name="volume" value="1" <?php if($data->volume==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="volume" value="0"><input type="checkbox" id="volume" name="volume" value="1" <?php if($data->volume==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Volume Dock" ); ?></td>
-        <td><input type="hidden" name="fullscreen" value=""><input type="checkbox" id="fullscreen" name="fullscreen" value="1" <?php if($data->fullscreen==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="fullscreen" value="0"><input type="checkbox" id="fullscreen" name="fullscreen" value="1" <?php if($data->fullscreen==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Fullscreen Dock" ); ?></td>
-        <td><input type="hidden" name="playdock" value=""><input type="checkbox" id="playdock" name="playdock" value="1" <?php if($data->playdock==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playdock" value="0"><input type="checkbox" id="playdock" name="playdock" value="1" <?php if($data->playdock==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("Play Dock" ); ?></td>
       </tr>
       <tr>
-        <td><input type="hidden" name="playlist" value=""><input type="checkbox" id="playlist" name="playlist" value="1" <?php if($data->playlist==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playlist" value="0"><input type="checkbox" id="playlist" name="playlist" value="1" <?php if($data->playlist==1){echo 'checked="checked" ';}?>></td>
         <td><?php _e("PlayList" ); ?></td>
       </tr>
     </table>
@@ -111,7 +112,7 @@ $vname = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE i
         <label>&nbsp;&nbsp;<?php _e("Playlist" ); ?></label></td>
 	  </tr>
       <tr id="_videoid">
-      	<td><?php _e("Video ID" ); ?></td>
+      	<td><?php _e("Video Name" ); ?></td>
         <td><input type="hidden" id="videoid" name="videoid" value="<?php echo $data->videoid; ?>"><input type="text" id="video" name="video" value="<?php echo $vname->title; ?>" size="50"></td>
       </tr>
       <tr id="_playlistid">
@@ -131,15 +132,15 @@ $vname = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."hdwplayer_videos WHERE i
       </tr>
       <tr id="_playlistautoplay">
       	<td><?php _e("Playlist Autoplay" ); ?></td>
-        <td><input type="hidden" name="playlistautoplay" value=""><input type="checkbox" id="playlistautoplay" name="playlistautoplay" value="1" <?php if($data->playlistautoplay==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playlistautoplay" value="0"><input type="checkbox" id="playlistautoplay" name="playlistautoplay" value="1" <?php if($data->playlistautoplay==1){echo 'checked="checked" ';}?>></td>
       </tr>
       <tr id="_playlistopen">
       	<td><?php _e("Playlist Open" ); ?></td>
-        <td><input type="hidden" name="playlistopen" value=""><input type="checkbox" id="playlistopen" name="playlistopen" value="1" <?php if($data->playlistopen==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playlistopen" value="0"><input type="checkbox" id="playlistopen" name="playlistopen" value="1" <?php if($data->playlistopen==1){echo 'checked="checked" ';}?>></td>
       </tr>
       <tr id="_playlistrandom">
       	<td><?php _e("Playlist Random" ); ?></td>
-        <td><input type="hidden" name="playlistrandom" value=""><input type="checkbox" id="playlistrandom" name="playlistrandom" value="1" <?php if($data->playlistrandom==1){echo 'checked="checked" ';}?>></td>
+        <td><input type="hidden" name="playlistrandom" value="0"><input type="checkbox" id="playlistrandom" name="playlistrandom" value="1" <?php if($data->playlistrandom==1){echo 'checked="checked" ';}?>></td>
       </tr>
       <tr id="_galleryid">
       	<td><?php _e("Choose Your Gallery" ); ?></td>

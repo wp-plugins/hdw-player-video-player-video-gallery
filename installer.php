@@ -13,7 +13,7 @@ function hdwplayer_db_install() {
 
 	if ($installed_hdwplayer_version != $hdwplayer_version) {
     	$table_name = $wpdb->prefix . "hdwplayer";
-		$sql = "CREATE TABLE " . $table_name . " (
+		$sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
 		`videoid` int(5) NOT NULL,
 		`playlistid` int(5) NOT NULL,
@@ -43,7 +43,7 @@ function hdwplayer_db_install() {
    		$wpdb->query($sql);
 		
 		$table_name = $wpdb->prefix . "hdwplayer_videos";
-		$sql = "CREATE TABLE " . $table_name . " (
+		$sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
 		`playlistid` int(5) NOT NULL,
 		`title` varchar(255) NOT NULL,
@@ -61,7 +61,7 @@ function hdwplayer_db_install() {
    		$wpdb->query($sql);
 		
 		$table_name = $wpdb->prefix . "hdwplayer_playlist";
-		$sql = "CREATE TABLE " . $table_name . " (
+		$sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
   		`name` varchar(255) NOT NULL,
 		UNIQUE KEY (`id`)
@@ -69,7 +69,7 @@ function hdwplayer_db_install() {
    		$wpdb->query($sql);
    		
    		$table_name = $wpdb->prefix . "hdwplayer_gallery";
-   		$sql = "CREATE TABLE " . $table_name . " (
+   		$sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
   		`name` varchar(255) NOT NULL,
   		`rows` int(3) NOT NULL,
@@ -168,7 +168,7 @@ function hdwplayer_update_db_check() {
         }
         
         $table_name = $wpdb->prefix . "hdwplayer_gallery";
-        $sql = "CREATE TABLE " . $table_name . " (
+        $sql = "CREATE TABLE IF NOT EXISTS " . $table_name . " (
   		`id` int(5) NOT NULL AUTO_INCREMENT,
   		`name` varchar(255) NOT NULL,
   		`rows` int(3) NOT NULL,

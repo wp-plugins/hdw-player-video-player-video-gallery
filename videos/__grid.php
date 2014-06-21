@@ -72,7 +72,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
     function process_bulk_action() {
 		if( 'delete'===$this->current_action() ) {			
 			foreach($_GET['video'] as $video) {
-				$this->wpdb->query("DELETE FROM $this->table_name WHERE id=".$video);
+				$this->wpdb->query($this->wpdb->prepare("DELETE FROM $this->table_name WHERE id=%d",$video));
         	}
 			echo '<script>window.location="?page=videos";</script>';
 		}
@@ -84,10 +84,10 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 					if($v < 1){
 						$order['ordering'] = 1;
 					}
-					$this->wpdb->update($this->table_name, $order, array('id' => $k));
+					$this->wpdb->update($this->table_name, $order, array('id' => $k),array('%d'));
 				}
 				$ordering = array();
-				$data  = $this->wpdb->get_results("SELECT id,ordering FROM $this->table_name WHERE playlistid=$key ORDER BY ordering");
+				$data  = $this->wpdb->get_results($this->wpdb->prepare("SELECT id,ordering FROM $this->table_name WHERE playlistid=%d ORDER BY ordering",$key));
 				foreach($data as $d){
 					
 					if(trim($d->ordering) < 1){
@@ -95,7 +95,7 @@ class Hdwplayer_Videos_Table extends WP_List_Table {
 					}
 					if(in_array(trim($d->ordering),$ordering)){
 						$order['ordering'] = trim($d->ordering) + 1;	
-						$this->wpdb->update($this->table_name, $order, array('id' => $d->id));
+						$this->wpdb->update($this->table_name, $order, array('id' => $d->id),array('%d'));
 						$ordering[] = trim($d->ordering) + 1;
 					}else{
 						$ordering[] = trim($d->ordering);

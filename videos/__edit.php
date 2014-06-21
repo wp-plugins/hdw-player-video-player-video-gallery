@@ -5,10 +5,21 @@
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
-	$video  = $wpdb->get_row("SELECT playlistid FROM ".$table_name." WHERE id=".trim($_GET['id']));
+	$video  = $wpdb->get_row($wpdb->prepare("SELECT playlistid FROM ".$table_name." WHERE id=%d",intval(trim($_GET['id']))));
+	
+	if($_POST['type'] == "youtube"){
+		$youtubeID = array();
+		preg_match('/https?\:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})/',$_POST['video'],$youtubeID);
+		if($_POST['thumb'] == ""){
+			$_POST['thumb']     = 'http://img.youtube.com/vi/'.$youtubeID[1].'/default.jpg';
+		}
+		if($_POST['preview'] == ""){
+			$_POST['preview']   = 'http://img.youtube.com/vi/'.$youtubeID[1].'/sddefault.jpg';
+		}
+	}
 	
 	if($video->playlistid != $_POST['playlistid']){
-		$lorder  = $wpdb->get_row("SELECT MAX(ordering) As max FROM ".$table_name." WHERE playlistid=".$_POST['playlistid']);
+		$lorder  = $wpdb->get_row($wpdb->prepare("SELECT MAX(ordering) As max FROM ".$table_name." WHERE playlistid=%d",$_POST['playlistid']));
 		if($lorder->max != '')
 		{
 			$_POST['ordering'] = $lorder->max+1;
@@ -16,14 +27,15 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			$_POST['ordering'] = '1';
 		}
 	}
-	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
+	$format = array('%s','%s','%s','%s','%s','%s','%d');
+	$wpdb->update($table_name, $_POST, array('id' => intval($_GET['id'])),$format);
 	echo '<script>window.location="?page=videos";</script>';
 }
 
 /******************************************************************
 /* Getting Input from the DB Table
 ******************************************************************/
-$data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
+$data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",intval($_GET['id'])));
 	
 ?>
 <div class="wrap">
@@ -104,7 +116,6 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
 	document.getElementById('_thumb').style.display="none";
 	document.getElementById('_preview').style.display="none";
 	switch(typ) {
-		case 'youtube' :
 		case 'dailymotion' :
 			document.getElementById('features').style.display="";
 			document.getElementById('features').innerHTML="Pro Features";
@@ -116,6 +127,11 @@ $data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
 		case 'bitgravity' :
 			document.getElementById('features').style.display="";
 			document.getElementById('features').innerHTML="Premium Features";
+			break;
+		case 'youtube' :
+			document.getElementById('__video').style.display="";
+			document.getElementById('_thumb').style.display="";
+			document.getElementById('_preview').style.display="";
 			break;
 		case 'video' :
 			document.getElementById('__video').style.display="";

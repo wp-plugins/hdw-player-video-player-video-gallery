@@ -45,7 +45,7 @@ class Hdwplayer_Playlist_Table extends WP_List_Table {
     function process_bulk_action() {
 		if( 'delete'===$this->current_action() ) {			
 			foreach($_GET['playlist'] as $playlist) {
-				$this->wpdb->query("DELETE FROM $this->table_name WHERE id=".$playlist);
+				$this->wpdb->query($this->wpdb->prepare("DELETE FROM $this->table_name WHERE id=%d",$playlist));
         	}
 			echo '<script>window.location="?page=playlist";</script>';
 		}

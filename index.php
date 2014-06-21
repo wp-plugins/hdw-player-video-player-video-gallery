@@ -1,11 +1,11 @@
 <?php
 /******************************************************************
 Plugin Name:HDW Player
-Plugin URI:http://hdwplayer.com/
+Plugin URI:http://www.hdwplayer.com
 Description: HDW Player Plugin for Wordpress Websites.
-Version:3.1
+Version:3.2
 Author:Mr. Hdwplayer
-Author URI:http://hdwplayer.com
+Author URI:http://www.hdwplayer.com
 License: GPLv2
 ******************************************************************/
 
@@ -18,7 +18,7 @@ global $hdwplayer_version;
 global $installed_hdwplayer_version;
 global $mytoken;
 
-$hdwplayer_version = "3.1";
+$hdwplayer_version = "3.2";
 $installed_hdwplayer_version = get_site_option('hdwplayer_version');
 
 /******************************************************************
@@ -61,4 +61,12 @@ if (is_admin()) {
 	register_uninstall_hook(__FILE__, 'hdwplayer_db_uninstall');
 }
 add_action('init', 'hdwplayer_gallery_ajax');
+
+add_action( 'init', 'hwplayer_plugin_js' );
+
+function hwplayer_plugin_js() {    
+	if( !is_admin()){    
+		wp_enqueue_script('jquery');
+	}
+}
 ?>

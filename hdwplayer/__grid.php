@@ -64,7 +64,7 @@ class Hdwplayer_Table extends WP_List_Table {
     function process_bulk_action() {
 		if( 'delete'===$this->current_action() ) {			
 			foreach($_GET['player'] as $player) {
-				$this->wpdb->query("DELETE FROM $this->table_name WHERE id=".$player);
+				$this->wpdb->query($this->wpdb->prepare("DELETE FROM $this->table_name WHERE id=%d",$player));
         	}
 			echo '<script>window.location="?page=hdwplayer";</script>';
 		}

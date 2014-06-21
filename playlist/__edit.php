@@ -5,14 +5,15 @@
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
-	$wpdb->update($table_name, $_POST, array('id' => $_GET['id']));
+	$format = array('%s');
+	$wpdb->update($table_name, $_POST, array('id' => intval($_GET['id'])), $format);
 	echo '<script>window.location="?page=playlist";</script>';
 }
 
 /******************************************************************
 /* Getting Input from the DB Table
 ******************************************************************/
-$data = $wpdb->get_row("SELECT * FROM $table_name WHERE id=".$_GET['id']);
+$data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",intval($_GET['id'])));
 	
 ?>
 <div class="wrap">

@@ -5,7 +5,8 @@
 ******************************************************************/
 if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 	unset($_POST['edited'], $_POST['save'], $_POST['_wpnonce'], $_POST['_wp_http_referer']);
-	$wpdb->insert($table_name, $_POST);
+	$format = array('%s');
+	$wpdb->insert($table_name, $_POST, $format);
 	echo '<script>window.location="?page=playlist";</script>';
 }
 	

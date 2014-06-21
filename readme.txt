@@ -3,7 +3,7 @@ Contributors: HDW Player
 Tags: video, player, gallery, video player, video gallery, hd, hdw, high, definition, wordpress, plugin, hd webplayer, hdw player
 Requires at least: 2.8.6
 Tested up to: 3.x
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv2
 
 This plugin is provided by HDW Player (video player & video gallery). It enables you to embed HDW Player on your WordPress websites.
@@ -98,7 +98,9 @@ Adding Webplayer to your Wordpress require three necessary steps :
 1. Creating a Playlist Name.
 2. Adding Videos to the Playlist.
 3. Adding the Playlist to the Player.
-4. Adding the Gallery to the Player.
+4. Creating Gallery.
+5. Adding the Gallery to the Player.
+6. Adding Player to WordPres Page/Post
 
 STEP 1 : Creating a Playlist Name
 
@@ -136,6 +138,10 @@ Step 5: Adding Gallery to Player
 4. Change the Display Gallery Option From none  to Display
 5. Choose Your Gallery Name and Save it.
 
+Step 6: Add Player to WordPress Page/Post
+1. Copy code from HDW Player listing page.
+2. Paste code to WordPress page/post.
+
 Change the Order of videos:
 1. Enter the order no in the text box on video list page.
 2. Choose Change order from Bulk Action and click apply button.
@@ -164,3 +170,8 @@ Note : Creating a Playlist is not compulsary. You can also directly add the Vide
 = 3.1 =
 * Free package version changed to support limited options only as hdw player updated its new pricing and package model. This package does support direct videos only like .mp4, .flv.
 * Autocomplete for adding single video in the HDW Player Menu.
+
+= 3.2 =
+* SQL queries optimized.
+* Issue on adding single video to player.
+* Add Youtube Features.
