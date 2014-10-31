@@ -81,7 +81,7 @@ add_action('template_redirect', 'plugin_trigger_check');
 		echo '<playlist>'.$br;		
 		echo '<media>'.$br;
 		echo '<id>'.$item->id.'</id>'.$br;
-		echo '<type>video</type>'.$br;
+		echo '<type>'.$item->type.'</type>'.$br;
 		echo '<video>'.$item->video.'</video>'.$br;
 		if($item->hdvideo) {
 			echo '<hd>'.$item->hdvideo.'</hd>'.$br;

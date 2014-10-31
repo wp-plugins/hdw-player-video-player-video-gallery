@@ -17,6 +17,41 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			$_POST['preview']   = 'http://img.youtube.com/vi/'.$youtubeID[1].'/sddefault.jpg';
 		}
 	}
+
+	if($_POST['type'] == "vimeo"){
+		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
+			$link = $_POST['video'];
+			$link = str_replace('http://vimeo.com/', 'http://vimeo.com/api/v2/video/', $link) . '.php';
+			$html_returned = unserialize(file_get_contents($link));
+			if($_POST['thumb'] == ''){
+				$_POST['thumb'] = $html_returned[0]['thumbnail_medium'];
+			}
+			if($_POST['preview'] == ''){
+				$_POST['preview'] = $html_returned[0]['thumbnail_large'];
+			}
+		}
+	}
+	if($_POST['type'] == "dailymotion"){
+		if($_POST['thumb'] == '' || $_POST['preview'] == ''){
+			$url = $_POST['video'];
+			$id = strtok(basename($url), '_');
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, "https://api.dailymotion.com/video/$id?fields=thumbnail_medium_url,thumbnail_url");
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			$output = curl_exec($ch);
+			curl_close($ch);
+			$output = json_decode($output);
+			if($_POST['thumb'] == ''){
+				$_POST['thumb'] = $output->thumbnail_medium_url;
+			}
+			if($_POST['preview'] == ''){
+				$_POST['preview'] = $output->thumbnail_url;
+			}
+		}
+	}
 	
 	if($video->playlistid != $_POST['playlistid']){
 		$lorder  = $wpdb->get_row($wpdb->prepare("SELECT MAX(ordering) As max FROM ".$table_name." WHERE playlistid=%d",$_POST['playlistid']));
@@ -62,10 +97,10 @@ $data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",in
             <option value="highwinds" id="highwinds" >SMIL</option>
             <option value="lighttpd" id="lighttpd" >Lighttpd Videos</option>
             <option value="bitgravity" id="bitgravity" >Bitgravity Videos</option>
-          </select><span id="features" style="margin-left: 15px; color: rgb(218, 41, 233); font-weight:bold;"></span>
+          </select>
           <?php echo '<script>document.getElementById("'.$data->type.'").selected="selected"</script>'; ?> </td>
       </tr>
-      <tr id="__video">
+      <tr>
         <td width="30%"><?php _e("Video URL " ); ?></td>
         <td><input type="text" id="_video" name="video" value="<?php echo $data->video; ?>" size="50"></td>
       </tr>
@@ -73,13 +108,25 @@ $data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",in
         <td width="30%"><?php _e("HD Video URL" ); ?></td>
         <td><input type="text" id="hdvideo" name="hdvideo" value="<?php echo $data->hdvideo; ?>" size="50"></td>
       </tr>
-      <tr id="_preview">
+      <tr id="_streamer">
+        <td class="key"><?php _e("Streamer" ); ?></td>
+        <td><input type="text" id="streamer" name="streamer" size="60" value="<?php echo $data->streamer; ?>" /></td>
+      </tr>
+      <tr id="_token">
+        <td class="key"><?php _e("Security Token [Wowza]" ); ?></td>
+        <td><input type="text" id="token" name="token" size="60" value="<?php echo $data->token; ?>"/></td>
+      </tr>
+      <tr>
         <td><?php _e("Preview Image" ); ?></td>
         <td><input type="text" id="preview" name="preview" value="<?php echo $data->preview; ?>" size="50"></td>
       </tr>
-       <tr id="_thumb">
+       <tr>
         <td><?php _e("Thumb Image" ); ?></td>
         <td><input type="text" id="thumb" name="thumb" value="<?php echo $data->thumb; ?>" size="50"></td>
+      </tr>
+      <tr id="_dvr">
+        <td class="key"><?php _e("DVR" ); ?></td>
+        <td><input type="hidden" name="dvr" value=""><input type="checkbox" id="dvr" name="dvr" value="1" <?php if($data->dvr==1){echo 'checked="checked" ';}?> /></td>
       </tr>
       <tr>
         <td class="key"><?php _e("Choose your Playlist" ); ?></td>
@@ -110,38 +157,23 @@ $data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id=%d",in
  changeType(<?php echo "'".$data->type."'"; ?>);
 
  function changeType(typ) {
-	document.getElementById('features').style.display="none";
-	document.getElementById('__video').style.display="none";
 	document.getElementById('_hdvideo').style.display="none";
-	document.getElementById('_thumb').style.display="none";
-	document.getElementById('_preview').style.display="none";
-	switch(typ) {
-		case 'dailymotion' :
-			document.getElementById('features').style.display="";
-			document.getElementById('features').innerHTML="Pro Features";
-			break;
-		case 'vimeo' :
+	document.getElementById('_streamer').style.display="none";
+	document.getElementById('_dvr').style.display="none";
+	document.getElementById('_token').style.display="none";
+
+    switch(typ) {
 		case 'rtmp' :
-		case 'highwinds' :
-		case 'lighttpd' :
-		case 'bitgravity' :
-			document.getElementById('features').style.display="";
-			document.getElementById('features').innerHTML="Premium Features";
+			document.getElementById('_streamer').style.display="";
+			document.getElementById('_token').style.display="";
 			break;
-		case 'youtube' :
-			document.getElementById('__video').style.display="";
-			document.getElementById('_thumb').style.display="";
-			document.getElementById('_preview').style.display="";
+		case 'bitgravity' :
+			document.getElementById('_dvr').style.display="";
 			break;
 		case 'video' :
-			document.getElementById('__video').style.display="";
 			document.getElementById('_hdvideo').style.display="";
-			document.getElementById('_thumb').style.display="";
-			document.getElementById('_preview').style.display="";
 			break;
-		default:
-			
-	}
+		}
  }
 
 function webplayer_validate() {
