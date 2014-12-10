@@ -3,7 +3,7 @@ Contributors: HDW Player
 Tags: video, player, gallery, video player, video gallery, hd, hdw, high, definition, wordpress, plugin, hd webplayer, hdw player
 Requires at least: 2.8.6
 Tested up to: 3.x
-Stable tag: 3.3
+Stable tag: 3.4
 License: GPLv2
 
 This plugin is provided by HDW Player (video player & video gallery). It enables you to embed HDW Player on your WordPress websites.
@@ -179,3 +179,6 @@ Note : Creating a Playlist is not compulsary. You can also directly add the Vide
 = 3.3 =
 * Add Dailymotion, Vimeo playback features.
 * Add RTMP streaming features.
+
+= 3.4 =
+* Bug fixed when editing the video

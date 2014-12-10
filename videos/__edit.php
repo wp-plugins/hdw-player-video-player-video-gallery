@@ -62,7 +62,7 @@ if($_POST['edited'] == 'true' && check_admin_referer( 'hdwplayer-nonce')) {
 			$_POST['ordering'] = '1';
 		}
 	}
-	$format = array('%s','%s','%s','%s','%s','%s','%d');
+	$format = array('%s','%s','%s','%s','%s','%s','%s','%s','%d','%d');	
 	$wpdb->update($table_name, $_POST, array('id' => intval($_GET['id'])),$format);
 	echo '<script>window.location="?page=videos";</script>';
 }
