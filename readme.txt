@@ -2,7 +2,7 @@
 Contributors: HDW Player
 Tags: video, player, gallery, video player, video gallery, hd, hdw, high, definition, wordpress, plugin, hd webplayer, hdw player
 Requires at least: 2.8.6
-Tested up to: 3.x
+Tested up to: 4.x
 Stable tag: 3.4
 License: GPLv2
 
