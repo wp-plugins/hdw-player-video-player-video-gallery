@@ -81,6 +81,10 @@ function hdwplayer_plugin_shortcode($atts) {
 			case 'dailymotion' :
 				$html5 .= '<iframe frameborder="0" width="100%" height="100%" src="' . $results->video . '"></iframe>';
 				break;
+			case 'vimeo' :
+				$vimeoid = substr(parse_url($results->video, PHP_URL_PATH), 1);
+				$html5 .= '<iframe frameborder="0" width="100%" height="100%" src="http://player.vimeo.com/video/' . $vimeoid . '?badge=0"></iframe>';
+				break;
 			case 'rtmp' :
 				$url_string = str_replace ( 'rtmp', 'http', $results->streamer ) . '/' . $results->video . '/playlist.m3u8';
 				$html5 .= '<video poster="' . $results->preview . '" onclick="this.play();" width="100%" height="100%" controls>';
